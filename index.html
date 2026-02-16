@@ -166,22 +166,24 @@
                     </div>
                     <h3 style="color: var(--primary); font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Study in Canada</h3>
                     <p style="color: var(--text-light); line-height: 1.6; margin-bottom: 1.5rem;">Study permits, extensions, and post-graduation pathways.</p>
+                    <a href="service-studying.html" style="color: var(--primary); text-decoration: none; font-weight: 800; font-size: 2.5rem; line-height: 1;">→</a>
                 </div>
 
-                <!-- Card 3 - Family Sponsorship -->
+                <!-- Card 3 - Permanent Residence -->
                 <div class="service-card-new" style="background: white; padding: 2.5rem 2rem; border-radius: 1rem; border: 1px solid #e5e5e5; position: relative; transition: all 0.3s;">
                     <div style="position: absolute; top: 1.5rem; right: 1.5rem; opacity: 0.3;">
                         <img src="airplane.png" alt="" style="width: 80px; height: 80px; transform: rotate(-25deg);">
                     </div>
                     <div style="width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
-                        <img src="family.png" alt="Family Sponsorship" style="width: 40px; height: 40px;">
+                        <img src="family.png" alt="Permanent Residence" style="width: 40px; height: 40px;">
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
                         <div style="font-size: 3rem; font-weight: 100; color: #c0c0c0;">03</div>
                         <div style="width: 240px; height: 2px; background: #c0c0c0;"></div>
                     </div>
-                    <h3 style="color: var(--primary); font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Family Sponsorship</h3>
-                    <p style="color: var(--text-light); line-height: 1.6; margin-bottom: 1.5rem;">Spousal, child, and family reunification applications.</p>
+                    <h3 style="color: var(--primary); font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Permanent Residence</h3>
+                    <p style="color: var(--text-light); line-height: 1.6; margin-bottom: 1.5rem;">Express Entry, PNP, and pathways to permanent residence.</p>
+                    <a href="service-pr.html" style="color: var(--primary); text-decoration: none; font-weight: 800; font-size: 2.5rem; line-height: 1;">→</a>
                 </div>
 
                 <!-- Card 4 - Work in Canada -->
@@ -198,6 +200,7 @@
                     </div>
                     <h3 style="color: var(--primary); font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Work in Canada</h3>
                     <p style="color: var(--text-light); line-height: 1.6; margin-bottom: 1.5rem;">Work permits and strategies to gain Canadian experience.</p>
+                    <a href="service-working.html" style="color: var(--primary); text-decoration: none; font-weight: 800; font-size: 2.5rem; line-height: 1;">→</a>
                 </div>
             </div>
         </div>
@@ -485,16 +488,20 @@
                 
                 <!-- Right Side - Contact Form -->
                 <div style="background: white; padding: 3rem; border-radius: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                    <form action="#" method="POST" style="display: grid; gap: 1.5rem;">
+                    <div id="success-message" style="display: none; background: #d4edda; color: #155724; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border: 1px solid #c3e6cb;">
+                        <strong>Thank you!</strong> Your message has been sent successfully. We'll get back to you soon.
+                    </div>
+                    
+                    <form action="https://formspree.io/f/xqedzwwe" method="POST" target="hidden_iframe" onsubmit="showSuccess(); return true;" style="display: grid; gap: 1.5rem;">
                         <!-- Name and Phone -->
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                             <div>
                                 <label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600; font-size: 1rem;">Name*</label>
-                                <input type="text" placeholder="Enter your name" required style="width: 100%; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.95rem; outline: none; transition: border-color 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e0e0e0'">
+                                <input type="text" name="name" placeholder="Enter your name" required style="width: 100%; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.95rem; outline: none; transition: border-color 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e0e0e0'">
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600; font-size: 1rem;">Phone*</label>
-                                <input type="tel" placeholder="Enter your phone" required style="width: 100%; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.95rem; outline: none; transition: border-color 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e0e0e0'">
+                                <input type="tel" name="phone" placeholder="Enter your phone" required style="width: 100%; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.95rem; outline: none; transition: border-color 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e0e0e0'">
                             </div>
                         </div>
                         
@@ -502,11 +509,11 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                             <div>
                                 <label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600; font-size: 1rem;">Email*</label>
-                                <input type="email" placeholder="Enter your email" required style="width: 100%; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.95rem; outline: none; transition: border-color 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e0e0e0'">
+                                <input type="email" name="email" placeholder="Enter your email" required style="width: 100%; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.95rem; outline: none; transition: border-color 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e0e0e0'">
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600; font-size: 1rem;">Service</label>
-                                <select style="width: 100%; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.95rem; outline: none; transition: border-color 0.3s; background: white; cursor: pointer;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e0e0e0'">
+                                <select name="service" style="width: 100%; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.95rem; outline: none; transition: border-color 0.3s; background: white; cursor: pointer;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e0e0e0'">
                                     <option value="">Select your service</option>
                                     <option value="visiting">Visiting Canada</option>
                                     <option value="studying">Studying in Canada</option>
@@ -523,7 +530,7 @@
                         <!-- Message -->
                         <div>
                             <label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600; font-size: 1rem;">Message</label>
-                            <textarea placeholder="Write Your Message" rows="5" style="width: 100%; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.95rem; outline: none; transition: border-color 0.3s; resize: vertical; font-family: inherit;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e0e0e0'"></textarea>
+                            <textarea name="message" placeholder="Write Your Message" rows="5" style="width: 100%; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.95rem; outline: none; transition: border-color 0.3s; resize: vertical; font-family: inherit;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e0e0e0'"></textarea>
                         </div>
                         
                         <!-- Submit Button -->
@@ -653,12 +660,16 @@
                 
                 <div>
                     <h2 style="color: white; font-size: 3rem; font-weight: 700; line-height: 1.2; margin: 0;">Unlock exclusive<br>updates now!</h2>
+                    <div id="newsletter-success" style="display: none; background: white; color: #155724; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; font-weight: 600;">
+                        ✓ Thank you for subscribing!
+                    </div>
                 </div>
                 
-                <div style="display: flex; gap: 0; background: white; border-radius: 3rem; padding: 0.5rem; min-width: 400px;">
-                    <input type="email" placeholder="Enter your email" style="flex: 1; border: none; outline: none; padding: 1rem 1.5rem; font-size: 1rem; border-radius: 3rem; background: transparent;">
-                    <button style="background: var(--primary); color: white; padding: 1rem 2.5rem; border: none; border-radius: 3rem; font-weight: 600; font-size: 1rem; cursor: pointer; white-space: nowrap; transition: all 0.3s ease;">Subscribe</button>
-                </div>
+                <form action="https://formspree.io/f/xqedzwwe" method="POST" target="hidden_iframe" onsubmit="showNewsletterSuccess(); return true;" style="display: flex; gap: 0; background: white; border-radius: 3rem; padding: 0.5rem; min-width: 400px;">
+                    <input type="email" name="email" placeholder="Enter your email" required style="flex: 1; border: none; outline: none; padding: 1rem 1.5rem; font-size: 1rem; border-radius: 3rem; background: transparent;">
+                    <input type="hidden" name="form_type" value="newsletter">
+                    <button type="submit" style="background: var(--primary); color: white; padding: 1rem 2.5rem; border: none; border-radius: 3rem; font-weight: 600; font-size: 1rem; cursor: pointer; white-space: nowrap; transition: all 0.3s ease;">Subscribe</button>
+                </form>
             </div>
         </div>
     </section>
@@ -787,6 +798,41 @@
                 element.style.border = '2px solid var(--secondary)';
                 element.style.background = '#fff9f9';
             }
+        }
+    </script>
+    
+    <!-- Hidden iframe for form submission -->
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+    
+    <script>
+        function showSuccess() {
+            // Show success message
+            document.getElementById('success-message').style.display = 'block';
+            
+            // Reset form after a short delay
+            setTimeout(function() {
+                document.querySelector('form').reset();
+            }, 100);
+            
+            // Hide success message after 5 seconds
+            setTimeout(function() {
+                document.getElementById('success-message').style.display = 'none';
+            }, 5000);
+        }
+        
+        function showNewsletterSuccess() {
+            // Show newsletter success message
+            document.getElementById('newsletter-success').style.display = 'block';
+            
+            // Reset form after a short delay
+            setTimeout(function() {
+                document.querySelector('form[action*="formspree"]').reset();
+            }, 100);
+            
+            // Hide success message after 5 seconds
+            setTimeout(function() {
+                document.getElementById('newsletter-success').style.display = 'none';
+            }, 5000);
         }
     </script>
     

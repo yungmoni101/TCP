@@ -131,7 +131,11 @@
                         <h3>Book a Consultation</h3>
                         <p style="margin-bottom: 2rem;">Fill out the form below and we'll get back to you within 1-2 business days to schedule your consultation.</p>
                         
-                        <form action="#" method="post">
+                        <div id="success-message" style="display: none; background: #d4edda; color: #155724; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border: 1px solid #c3e6cb;">
+                            <strong>Thank you!</strong> Your inquiry has been submitted successfully. We'll get back to you within 1-2 business days.
+                        </div>
+                        
+                        <form action="https://formspree.io/f/xqedzwwe" method="POST" target="hidden_iframe" onsubmit="showSuccess(); return true;">
                             <div class="form-group">
                                 <label for="name">Full Name *</label>
                                 <input type="text" id="name" name="name" required>
@@ -318,12 +322,24 @@
         </div>
     </footer>
 
+    <!-- Hidden iframe for form submission -->
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
     <script>
-        // Simple form validation
-        document.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Thank you for your inquiry! In a real implementation, this form would be submitted to a server. Please contact us directly at info@tcpimmigration.ca or call +1 581-203-1198.');
-        });
+        function showSuccess() {
+            // Show success message
+            document.getElementById('success-message').style.display = 'block';
+            
+            // Reset form after a short delay
+            setTimeout(function() {
+                document.querySelector('form').reset();
+            }, 100);
+            
+            // Hide success message after 5 seconds
+            setTimeout(function() {
+                document.getElementById('success-message').style.display = 'none';
+            }, 5000);
+        }
     </script>
     <script src="mobile-menu.js"></script>
 </body>
