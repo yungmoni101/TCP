@@ -166,7 +166,6 @@ img {
     z-index: 100;
     border-radius: 0rem 0rem 2rem 2rem;
     margin-top: -2px;  /* Pull the navbar up to overlap */
-    overflow: hidden;  /* Ensure border radius is applied */
 }
 
 .navbar .container {
@@ -248,6 +247,7 @@ img {
     min-width: 250px;
     padding: 0.5rem 0;
     margin-top: 0;
+    z-index: 1000;
 }
 
 .dropdown-menu li {
@@ -1166,6 +1166,28 @@ section {
     
     .service-hero {
         padding: 3rem 0;
+    }
+}
+
+/* Medium screens - 3 column layout for service cards */
+@media (min-width: 1025px) and (max-width: 1400px) {
+    /* Services Section - 4 columns to 3 columns on medium screens */
+    .services-section div[style*="grid-template-columns: repeat(4, 1fr)"] {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 1.5rem !important;
+    }
+    
+    /* Client Feedback - 4 columns to 3 columns */
+    section div[style*="grid-template-columns: repeat(4, 1fr)"] {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 1.5rem !important;
+    }
+    
+    /* Adjust service card padding */
+    .service-card-new {
+        padding: 2rem 1.5rem !important;
     }
 }
 
