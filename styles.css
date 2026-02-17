@@ -1859,3 +1859,16 @@ section {
     display: none !important;
   }
 }
+
+@media (max-width: 600px) {
+  .peter-mobile-circle {
+    width: 100px !important;
+    height: 100px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    aspect-ratio: 1/1 !important;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
