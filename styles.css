@@ -41,8 +41,8 @@ img {
 }
 
 .container {
-    max-width: 90%;
-    width: 100%;
+    max-width: 1400px;
+    width: 90%;
     margin: 0 auto;
     padding: 0 2rem;
 }
@@ -1016,6 +1016,7 @@ section {
     
     .cta-buttons a {
         width: 100%;
+        justify-content: center !important;
     }
     
     /* Layout */
@@ -1166,6 +1167,24 @@ section {
     
     .service-hero {
         padding: 3rem 0;
+    }
+}
+
+/* Large screens - ensure 4-card grid displays properly */
+@media (min-width: 1401px) {
+    section div[style*="grid-template-columns: repeat(4, 1fr)"] {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 1.5rem !important;
+    }
+    
+    .service-card-new {
+        min-width: 0;
+        max-width: 100%;
+    }
+    
+    /* Ensure container doesn't exceed reasonable width on very large screens */
+    .container {
+        max-width: 1400px;
     }
 }
 
@@ -1824,4 +1843,11 @@ section {
     section form > div[style*="background: white"] {
         padding: 1.5rem 1rem !important;
     }
+}
+
+/* Hide elements on mobile */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
 }

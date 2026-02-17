@@ -132,7 +132,7 @@
                         <p style="margin-bottom: 2rem;">Fill out the form below and we'll get back to you within 1-2 business days to schedule your consultation.</p>
                         
                         <div id="success-message" style="display: none; background: #d4edda; color: #155724; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border: 1px solid #c3e6cb;">
-                            <strong>Thank you!</strong> Your inquiry has been submitted successfully. We'll get back to you within 1-2 business days.
+                            <strong>Thank you!</strong> Your inquiry has been submitted successfully. Redirecting you to book your consultation appointment...
                         </div>
                         
                         <form action="https://formspree.io/f/xqedzwwe" method="POST" target="hidden_iframe" onsubmit="showSuccess(); return true;">
@@ -335,10 +335,10 @@
                 document.querySelector('form').reset();
             }, 100);
             
-            // Hide success message after 5 seconds
+            // Redirect to Calendly after 2 seconds
             setTimeout(function() {
-                document.getElementById('success-message').style.display = 'none';
-            }, 5000);
+                window.location.href = 'https://calendly.com/tcpimmigration/30min?month=2026-02';
+            }, 2000);
         }
     </script>
     <script src="mobile-menu.js"></script>
