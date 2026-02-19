@@ -385,9 +385,19 @@
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                <!-- Left Column -->
+                <!-- Left Column - 6 items -->
                 <div>
                     <!-- Question 1 -->
+                    <div class="faq-box" onclick="toggleFaq(this)" style="border: 2px solid #e0e0e0; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; background: white; cursor: pointer; transition: all 0.3s ease;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">01.</span> What is Express Entry and am I eligible?</h4>
+                            <div class="faq-icon" style="width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 1.5rem; font-weight: bold; transition: all 0.3s ease;">+</div>
+                        </div>
+                        <hr class="faq-divider" style="border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; display: none;">
+                        <p class="faq-answer" style="color: #666; line-height: 1.8; margin: 0; padding-left: 2rem; display: none;">Express Entry is Canada's application management system for three federal economic immigration programs: Federal Skilled Worker, Federal Skilled Trades, and Canadian Experience Class. Eligibility depends on factors like age, education, work experience, and language ability. Book a consultation for a personalized assessment.</p>
+                    </div>
+
+                    <!-- Question 2 -->
                     <div class="faq-box" onclick="toggleFaq(this)" style="border: 2px solid #e0e0e0; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; background: white; cursor: pointer; transition: all 0.3s ease;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">02.</span> What is an RCIC and why does it matter?</h4>
@@ -406,78 +416,88 @@
                         <hr class="faq-divider" style="border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; display: none;">
                         <p class="faq-answer" style="color: #666; line-height: 1.8; margin: 0; padding-left: 2rem; display: none;">Our fees vary depending on the complexity of the service required. We provide transparent pricing upfront during your consultation. A consultation fee applies for the initial assessment, which is credited toward service fees if you proceed within one month.</p>
                     </div>
-                </div>
 
-                <!-- Right Column -->
-                <div>
-                    <!-- Question 5 -->
+                    <!-- Question 4 -->
                     <div class="faq-box" onclick="toggleFaq(this)" style="border: 2px solid #e0e0e0; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; background: white; cursor: pointer; transition: all 0.3s ease;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">05.</span> My visa was refused. Can you help?</h4>
+                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">04.</span> My visa was refused. Can you help?</h4>
                             <div class="faq-icon" style="width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 1.5rem; font-weight: bold; transition: all 0.3s ease;">+</div>
                         </div>
                         <hr class="faq-divider" style="border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; display: none;">
                         <p class="faq-answer" style="color: #666; line-height: 1.8; margin: 0; padding-left: 2rem; display: none;">Yes. We handle refusals and complex cases. We'll review your refusal letter, identify the reasons, and advise on the best course of action—whether reapplying with a stronger application, requesting reconsideration, or filing an appeal.</p>
                     </div>
 
-                    <!-- Question 6 -->
+                    <!-- Question 5 -->
                     <div class="faq-box" onclick="toggleFaq(this)" style="border: 2px solid #e0e0e0; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; background: white; cursor: pointer; transition: all 0.3s ease;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">06.</span> How do I sponsor my spouse or family member?</h4>
+                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">05.</span> How do I sponsor my spouse or family member?</h4>
                             <div class="faq-icon" style="width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 1.5rem; font-weight: bold; transition: all 0.3s ease;">+</div>
                         </div>
                         <hr class="faq-divider" style="border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; display: none;">
                         <p class="faq-answer" style="color: #666; line-height: 1.8; margin: 0; padding-left: 2rem; display: none;">Canadian citizens and permanent residents can sponsor eligible family members. Requirements include proving your relationship, meeting income requirements (for parents/grandparents), and demonstrating you can support your sponsored relative. We guide you through the entire sponsorship process.</p>
                     </div>
 
-                    <!-- Question 7 -->
+                    <!-- Question 6 -->
                     <div class="faq-box" onclick="toggleFaq(this)" style="border: 2px solid #e0e0e0; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; background: white; cursor: pointer; transition: all 0.3s ease;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">07.</span> Do you work with single applicants, couples, and families? Do you work with clients outside Canada?</h4>
+                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">06.</span> Do you work with single applicants, couples, and families? Do you work with clients outside Canada?</h4>
                             <div class="faq-icon" style="width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 1.5rem; font-weight: bold; transition: all 0.3s ease;">+</div>
                         </div>
                         <hr class="faq-divider" style="border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; display: none;">
                         <p class="faq-answer" style="color: #666; line-height: 1.8; margin: 0; padding-left: 2rem; display: none;">Yes. We work with single applicants, married or common-law couples, and families, both inside and outside Canada. Consultations and services can be provided remotely (voice or video conference) or in person, depending on your location and circumstances.</p>
                     </div>
+                </div>
 
-                    <!-- Question 8 -->
+                <!-- Right Column - 5 items -->
+                <div>
+                    <!-- Question 7 -->
                     <div class="faq-box" onclick="toggleFaq(this)" style="border: 2px solid #e0e0e0; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; background: white; cursor: pointer; transition: all 0.3s ease;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">08.</span> Who is responsible for my application?</h4>
+                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">07.</span> Who is responsible for my application?</h4>
                             <div class="faq-icon" style="width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 1.5rem; font-weight: bold; transition: all 0.3s ease;">+</div>
                         </div>
                         <hr class="faq-divider" style="border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; display: none;">
                         <p class="faq-answer" style="color: #666; line-height: 1.8; margin: 0; padding-left: 2rem; display: none;">Regardless of which consultant you initially speak with or book a consultation with, all applications are centrally overseen and managed by Peter Poon, CEO, who serves as the lead representative on all files. This ensures consistency, accountability, and compliance across every case.</p>
                     </div>
 
-                    <!-- Question 9 -->
+                    <!-- Question 8 -->
                     <div class="faq-box" onclick="toggleFaq(this)" style="border: 2px solid #e0e0e0; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; background: white; cursor: pointer; transition: all 0.3s ease;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">09.</span> What happens during a consultation?</h4>
+                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">08.</span> What happens during a consultation?</h4>
                             <div class="faq-icon" style="width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 1.5rem; font-weight: bold; transition: all 0.3s ease;">+</div>
                         </div>
                         <hr class="faq-divider" style="border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; display: none;">
                         <p class="faq-answer" style="color: #666; line-height: 1.8; margin: 0; padding-left: 2rem; display: none;">During a consultation, we assess your background, discuss your immigration goals, review eligibility, explain available pathways, and outline potential risks, timelines, and next steps. No applications are submitted without a consultation.</p>
                     </div>
 
-                    <!-- Question 10 -->
+                    <!-- Question 9 -->
                     <div class="faq-box" onclick="toggleFaq(this)" style="border: 2px solid #e0e0e0; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; background: white; cursor: pointer; transition: all 0.3s ease;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">10.</span> Does buying a business or property give permanent residence in Canada?</h4>
+                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">09.</span> Does buying a business or property give permanent residence in Canada?</h4>
                             <div class="faq-icon" style="width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 1.5rem; font-weight: bold; transition: all 0.3s ease;">+</div>
                         </div>
                         <hr class="faq-divider" style="border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; display: none;">
                         <p class="faq-answer" style="color: #666; line-height: 1.8; margin: 0; padding-left: 2rem; display: none;">Buying a business or property does not automatically grant permanent residence. However, buying a business or property in Canada can support and strengthen an immigration or permanent residence application when properly structured and aligned with an eligible program.</p>
                     </div>
 
-                    <!-- Question 11 -->
-                    <div class="faq-box" onclick="toggleFaq(this)" style="border: 2px solid #e0e0e0; border-radius: 1rem; padding: 2rem; background: white; cursor: pointer; transition: all 0.3s ease;">
+                    <!-- Question 10 -->
+                    <div class="faq-box" onclick="toggleFaq(this)" style="border: 2px solid #e0e0e0; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; background: white; cursor: pointer; transition: all 0.3s ease;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">11.</span> Can you help if my application was refused?</h4>
+                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">10.</span> Can you help if my application was refused?</h4>
                             <div class="faq-icon" style="width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 1.5rem; font-weight: bold; transition: all 0.3s ease;">+</div>
                         </div>
                         <hr class="faq-divider" style="border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; display: none;">
                         <p class="faq-answer" style="color: #666; line-height: 1.8; margin: 0; padding-left: 2rem; display: none;">Yes. We assist with refused applications, including reviewing refusal reasons, advising on re-application strategies, and addressing procedural fairness or admissibility concerns where applicable.</p>
+                    </div>
+
+                    <!-- Question 11 -->
+                    <div class="faq-box" onclick="toggleFaq(this)" style="border: 2px solid #e0e0e0; border-radius: 1rem; padding: 2rem; background: white; cursor: pointer; transition: all 0.3s ease;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4 style="font-size: 1.25rem; color: #333; font-weight: 600; margin: 0;"><span class="faq-number" style="color: #999; margin-right: 0.5rem;">11.</span> What makes TCP different from other immigration services?</h4>
+                            <div class="faq-icon" style="width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 1.5rem; font-weight: bold; transition: all 0.3s ease;">+</div>
+                        </div>
+                        <hr class="faq-divider" style="border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; display: none;">
+                        <p class="faq-answer" style="color: #666; line-height: 1.8; margin: 0; padding-left: 2rem; display: none;">We combine legal expertise, licensed representation, transparent fees, and honest advice. Our team is authorized to represent you before IRCC and the Immigration and Refugee Board. We don't make false promises—only realistic, well-prepared applications backed by Canadian immigration law.</p>
                     </div>
                 </div>
             </div>
