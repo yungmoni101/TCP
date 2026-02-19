@@ -1047,6 +1047,14 @@ section {
         gap: 1.5rem;
     }
     
+    .service-card {
+        text-align: center;
+    }
+    
+    .service-icon {
+        display: inline-block;
+    }
+    
     .stats {
         grid-template-columns: 1fr;
         gap: 1rem;
