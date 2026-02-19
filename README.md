@@ -7,7 +7,6 @@ This folder contains a fully functional static HTML version of the TCP Immigrati
 ### Main Pages
 - **index.html** - Home page with hero section, services overview, and call-to-action
 - **about.html** - About the company, team, mission, and values
-- **contact.html** - Contact form and office information
 - **services.html** - Complete list of all immigration services
 - **faqs.html** - Frequently asked questions with interactive accordion
 - **process.html** - Step-by-step explanation of the immigration process
