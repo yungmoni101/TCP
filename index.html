@@ -123,7 +123,7 @@
                 <a href="services.html" class="btn-primary-large" style="background: var(--secondary); color: white; padding: 1rem 2rem; border-radius: 2rem; text-decoration: none; font-weight: 600; white-space: nowrap; margin-top: 2.5rem;">See All Services</a>
             </div>
             
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; position: relative; width: 100%; overflow: visible;">
+            <div class="services-carousel" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; position: relative; width: 100%; overflow: visible;">
                 <!-- Card 1 - Visit Canada -->
                 <div class="service-card-new" style="background: white; padding: 2.5rem 2rem; border-radius: 1rem; border: 2px solid var(--secondary); position: relative; transition: all 0.3s;">
                     <div style="position: absolute; top: 1.5rem; right: 1.5rem; opacity: 0.3;">
@@ -191,6 +191,15 @@
                     <p style="color: var(--text-light); line-height: 1.6; margin-bottom: 1.5rem;">Work permits and strategies to gain Canadian experience.</p>
                     <a href="service-working.html" style="color: var(--primary); text-decoration: none; font-weight: 800; font-size: 2.5rem; line-height: 1;">→</a>
                 </div>
+            </div>
+
+            <!-- Carousel Navigation (Mobile only) -->
+            <div class="carousel-nav-mobile" style="display: none; justify-content: center; align-items: center; gap: 1rem; margin-top: 2rem;">
+                <button class="carousel-prev" style="background: #f0f0f0; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">←</button>
+                <div class="carousel-indicator" style="font-size: 0.9rem; color: #666; font-weight: 500;">
+                    <span class="current-slide">1</span> / <span class="total-slides">4</span>
+                </div>
+                <button class="carousel-next" style="background: var(--secondary); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">→</button>
             </div>
         </div>
     </section>

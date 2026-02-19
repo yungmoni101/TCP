@@ -1440,11 +1440,46 @@ section {
         margin: 0 auto 1rem !important;
     }
     
-    /* Services Section - 4 columns to 1 column */
-    .services-section div[style*="grid-template-columns: repeat(4, 1fr)"] {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        gap: 1.5rem !important;
+    /* Services Section - 4 columns to carousel on mobile */
+    .services-section .services-carousel {
+        display: block !important;
+        overflow: hidden !important;
+        gap: 0 !important;
+        grid-template-columns: none !important;
+    }
+    
+    .services-section .services-carousel .service-card-new {
+        display: none !important;
+        animation: slideIn 0.4s ease-in-out;
+    }
+    
+    .services-section .services-carousel .service-card-new.active {
+        display: block !important;
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .services-section .carousel-nav-mobile {
+        display: flex !important;
+    }
+    
+    .carousel-prev:hover,
+    .carousel-next:hover {
+        transform: scale(1.1) !important;
+    }
+    
+    .carousel-prev:active,
+    .carousel-next:active {
+        transform: scale(0.95) !important;
     }
     
     .services-section h2 {

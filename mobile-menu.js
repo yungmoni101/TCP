@@ -57,4 +57,48 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    
+    // Services Carousel Functionality
+    const carousel = document.querySelector('.services-carousel');
+    const cards = carousel ? carousel.querySelectorAll('.service-card-new') : [];
+    const prevBtn = document.querySelector('.carousel-prev');
+    const nextBtn = document.querySelector('.carousel-next');
+    const currentSlideSpan = document.querySelector('.current-slide');
+    let currentSlide = 0;
+    
+    function updateCarousel() {
+        cards.forEach((card, index) => {
+            card.classList.remove('active');
+            if (index === currentSlide) {
+                card.classList.add('active');
+            }
+        });
+        if (currentSlideSpan) {
+            currentSlideSpan.textContent = currentSlide + 1;
+        }
+    }
+    
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % cards.length;
+        updateCarousel();
+    }
+    
+    function prevSlide() {
+        currentSlide = (currentSlide - 1 + cards.length) % cards.length;
+        updateCarousel();
+    }
+    
+    // Initialize carousel on page load
+    if (cards.length > 0) {
+        updateCarousel();
+    }
+    
+    // Add event listeners
+    if (nextBtn) {
+        nextBtn.addEventListener('click', nextSlide);
+    }
+    if (prevBtn) {
+        prevBtn.addEventListener('click', prevSlide);
+    }
 });
+
