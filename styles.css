@@ -1652,22 +1652,53 @@ section {
     }
     
     /* Peter Poon Section */
-    section div[style*="grid-template-columns: 1fr 1fr"] {
+    .peter-poon-grid {
         display: block !important;
         gap: 2rem !important;
     }
     
-    section img[alt="Peter Poon"] {
-        width: 100% !important;
-        margin-bottom: 2rem;
+    .peter-image-container {
+        position: relative !important;
+        margin-bottom: 3rem;
     }
     
-    section img[alt="Peter Poon"] ~ div {
+    .peter-image-container img {
+        width: 90% !important;
+        margin-bottom: 0 !important;
+        display: block !important;
+    }
+    
+    .peter-image-container > div[style*="position: absolute"] {
+        position: absolute !important;
+        bottom: 80px !important;
+        right: -15px !important;
+        width: 45% !important;
+        max-width: 220px !important;
+        padding: 1.5rem !important;
+        background: var(--primary) !important;
+        color: white !important;
+        border-radius: 1rem !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+    }
+    
+    .peter-image-container > div[style*="position: absolute"] > div:first-child {
+        font-size: 3rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
+    .peter-image-container > div[style*="position: absolute"] > div:nth-child(2) {
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 0 !important;
+        line-height: 1.3 !important;
+    }
+    
+    .peter-image-container > div[style*="position: absolute"] > div:nth-child(3) {
+        display: none !important;
+    }
+    
+    section > div.container > div.peter-poon-grid + div {
         position: static !important;
-        bottom: auto !important;
-        right: auto !important;
-        margin-top: 1rem !important;
-        margin-bottom: 2rem;
     }
     
     section span[style*="Founder & Chief Executive Officer"] {
@@ -1779,45 +1810,7 @@ section {
     
     /* Newsletter Section */
     section[style*="position: relative; height: 0"] {
-        height: auto !important;
-        position: relative !important;
-    }
-    
-    section div[style*="linear-gradient(135deg, #C62828"] {
-        position: relative !important;
-        top: 0 !important;
-        flex-direction: column !important;
-        padding: 2rem 1rem !important;
-        gap: 1.5rem;
-        text-align: center;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
-    }
-    
-    section div[style*="linear-gradient(135deg, #C62828"] h2 {
-        font-size: 2rem !important;
-    }
-    
-    section div[style*="linear-gradient(135deg, #C62828"] > div:last-child {
-        min-width: auto !important;
-        width: 100%;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 0.5rem;
-        padding: 0 !important;
-        background: transparent !important;
-    }
-    
-    section div[style*="linear-gradient(135deg, #C62828"] input {
-        width: 100% !important;
-        background: white !important;
-        border-radius: 2rem !important;
-        padding: 1rem 1.5rem !important;
-    }
-    
-    section div[style*="linear-gradient(135deg, #C62828"] button {
-        width: 100% !important;
-        padding: 1rem 2rem !important;
+        display: none !important;
     }
     
     /* Footer */
