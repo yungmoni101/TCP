@@ -587,13 +587,17 @@ section {
 }
 
 .feature-icon {
-    font-size: 2rem;
+    font-size: 1.5rem;
     flex-shrink: 0;
+    margin-right: 0.5rem;
 }
 
 .feature h4 {
     color: var(--primary);
     margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .feature p {
