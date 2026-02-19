@@ -1038,6 +1038,10 @@ section {
         gap: 2rem;
     }
     
+    .two-column > div:first-child {
+        text-align: center;
+    }
+    
     .services-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
