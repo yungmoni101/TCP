@@ -163,10 +163,71 @@
             padding: 3rem 2.5rem;
             border: 1px solid rgba(255, 255, 255, 0.8);
         }
+        /* Modal Styles */
+        .privacy-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .privacy-modal {
+            background: white;
+            border-radius: 1rem;
+            padding: 3rem;
+            max-width: 550px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .privacy-modal h2 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        .privacy-modal p {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        .privacy-modal-btn {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            border: none;
+            padding: 0.9rem 2.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        .privacy-modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
     </style>
 </head>
 
 <body>
+    <!-- Privacy Information Modal -->
+    <div class="privacy-modal-overlay" id="privacyModal">
+        <div class="privacy-modal">
+            <h2>Protection of Personal Information</h2>
+            <p>The personal information appearing on this form, and in any documents that must be appended to it, is required for processing your application for Immigration to Canada or for a selection certificate and the application of the Act respecting immigration to Québec, the Regulation respecting the selection of foreign nationals, the Regulation respecting the immigration consultants and their administrative regulations.</p>
+            <p>Your personal information is confidential and may not be disclosed without your consent unless explicitly authorized by you.</p>
+            <button class="privacy-modal-btn" onclick="closePrivacyModal()">OK</button>
+        </div>
+    </div>
+
     <!-- Announcement Bar -->
     <div class="announcement-bar">
         <div class="container">
@@ -379,25 +440,25 @@
                             </div>
 
                             <!-- Business Experience -->
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                                <div class="form-group">
-                                    <label class="form-label">Business Experience <span style="color: #d32f2f;">*</span></label>
-                                    <select name="business_experience" required class="form-input">
-                                        <option value="">-- Select --</option>
-                                        <option value="Yes">Yes, I have</option>
-                                        <option value="No">No, I haven't</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Business Description</label>
-                                    <input type="text" name="business_description" class="form-input" placeholder="Industry and your role">
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label">Have you ever owned or managed a business? <span style="color: #d32f2f;">*</span></label>
+                                <select name="business_experience" required class="form-input" id="business-select" onchange="toggleBusinessFields()">
+                                    <option value="">-- Select --</option>
+                                    <option value="Yes">Yes, I have</option>
+                                    <option value="No">No, I haven't</option>
+                                </select>
                             </div>
 
-                            <!-- Employment Status -->
-                            <div class="form-group">
-                                <label class="form-label">Current Employment <span style="color: #d32f2f;">*</span></label>
-                                <select name="employment_status" required class="form-input">
+                            <!-- Business Description (Conditional) -->
+                            <div class="form-group" id="business-description-field" style="display: none;">
+                                <label class="form-label">If yes, briefly describe the business (industry and role)</label>
+                                <input type="text" name="business_description" class="form-input" placeholder="Industry and your role">
+                            </div>
+
+                            <!-- Employment Status (Conditional) -->
+                            <div class="form-group" id="employment-field" style="display: none;">
+                                <label class="form-label">Are you currently employed, self-employed, or a business owner?</label>
+                                <select name="employment_status" class="form-input">
                                     <option value="">-- Select --</option>
                                     <option value="Employed">Employed</option>
                                     <option value="Self-employed">Self-employed</option>
@@ -577,6 +638,29 @@
                 document.querySelector('textarea[name="application_outcome"]').value = '';
             }
         }
+
+        function toggleBusinessFields() {
+            const businessSelect = document.getElementById('business-select');
+            const businessDescField = document.getElementById('business-description-field');
+            const employmentField = document.getElementById('employment-field');
+            if (businessSelect.value === 'Yes') {
+                businessDescField.style.display = 'block';
+                employmentField.style.display = 'block';
+            } else {
+                businessDescField.style.display = 'none';
+                employmentField.style.display = 'none';
+                document.querySelector('input[name="business_description"]').value = '';
+                document.querySelector('select[name="employment_status"]').value = '';
+            }
+        }
+
+        function closePrivacyModal() {
+            document.getElementById('privacyModal').style.display = 'none';
+        }
+
+        window.onload = function() {
+            document.getElementById('privacyModal').style.display = 'flex';
+        };
     </script>
     
     <!-- Smartsupp Live Chat script -->
