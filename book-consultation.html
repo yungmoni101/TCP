@@ -338,25 +338,19 @@
                             </div>
 
                             <!-- Previous Application -->
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                                <div class="form-group">
-                                    <label class="form-label">Prior Canadian Application <span style="color: #d32f2f;">*</span></label>
-                                    <select name="previous_application" required class="form-input">
-                                        <option value="">-- Select --</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Application Outcome</label>
-                                    <select name="application_outcome" class="form-input">
-                                        <option value="">-- Select --</option>
-                                        <option value="Approved">Approved</option>
-                                        <option value="Refused">Refused</option>
-                                        <option value="Withdrawn">Withdrawn</option>
-                                        <option value="Still in process">Still in process</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label">Have you previously applied for any Canadian visa or permit? <span style="color: #d32f2f;">*</span></label>
+                                <select name="previous_application" required class="form-input" id="previous-app-select" onchange="toggleApplicationOutcome()">
+                                    <option value="">-- Select --</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </div>
+
+                            <!-- Application Outcome -->
+                            <div class="form-group" id="outcome-field" style="display: none;">
+                                <label class="form-label">If yes, please share the outcome of the process</label>
+                                <textarea name="application_outcome" class="textarea-input" placeholder="Describe the outcome of your previous application..."></textarea>
                             </div>
 
                             <!-- File Upload -->
@@ -570,6 +564,17 @@
             } else {
                 childrenField.style.display = 'none';
                 document.querySelector('input[name="number_of_children"]').value = '';
+            }
+        }
+
+        function toggleApplicationOutcome() {
+            const prevAppSelect = document.getElementById('previous-app-select');
+            const outcomeField = document.getElementById('outcome-field');
+            if (prevAppSelect.value === 'Yes') {
+                outcomeField.style.display = 'block';
+            } else {
+                outcomeField.style.display = 'none';
+                document.querySelector('textarea[name="application_outcome"]').value = '';
             }
         }
     </script>
