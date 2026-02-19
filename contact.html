@@ -70,7 +70,7 @@
                 <li><a href="faqs.html">FAQs</a></li>
                 <li><a href="contact.html" class="active">Contact Us</a></li>
             </ul>
-            <a href="contact.html" class="btn-primary">Book a Consultation</a>
+            <a href="book-consultation.html" class="btn-primary">Book a Consultation</a>
         </div>
     </nav>
 
@@ -329,16 +329,10 @@
         function showSuccess() {
             // Show success message
             document.getElementById('success-message').style.display = 'block';
-            
             // Reset form after a short delay
             setTimeout(function() {
                 document.querySelector('form').reset();
             }, 100);
-            
-            // Redirect to Calendly after 2 seconds
-            setTimeout(function() {
-                window.location.href = 'https://calendly.com/tcpimmigration/30min?month=2026-02';
-            }, 2000);
         }
     </script>
     <script src="mobile-menu.js"></script>
