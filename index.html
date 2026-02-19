@@ -115,12 +115,12 @@
     <!-- Services Section -->
     <section id="services" class="services-section" style="padding-top: 8rem; padding-bottom: 4rem; margin-top: 4rem; background: #E3F2FD;">
         <div class="container">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3rem;">
+            <div class="services-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3rem;">
                 <div>
                     <span class="label" style="color: var(--secondary); background: white; border: 2px solid var(--secondary); padding: 0.5rem 1rem; border-radius: 2rem; display: inline-block; margin-bottom: 1rem;">SERVICES</span>
                     <h2 style="font-size: 3rem; color: var(--primary); font-weight: 700; line-height: 1.2;">Expert Immigration<br>Services</h2>
                 </div>
-                <a href="services.html" class="btn-primary-large" style="background: var(--secondary); color: white; padding: 1rem 2rem; border-radius: 2rem; text-decoration: none; font-weight: 600; white-space: nowrap; margin-top: 2.5rem;">See All Services</a>
+                <a href="services.html" class="btn-see-all-services" style="background: var(--secondary); color: white; padding: 1rem 2rem; border-radius: 2rem; text-decoration: none; font-weight: 600; white-space: nowrap; margin-top: 2.5rem;">See All Services</a>
             </div>
             
             <div class="services-carousel" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; position: relative; width: 100%; overflow: visible;">
@@ -194,12 +194,15 @@
             </div>
 
             <!-- Carousel Navigation (Mobile only) -->
-            <div class="carousel-nav-mobile" style="display: none; justify-content: center; align-items: center; gap: 1rem; margin-top: 2rem;">
-                <button class="carousel-prev" style="background: #f0f0f0; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">←</button>
-                <div class="carousel-indicator" style="font-size: 0.9rem; color: #666; font-weight: 500;">
-                    <span class="current-slide">1</span> / <span class="total-slides">4</span>
+            <div class="carousel-nav-mobile" style="display: none; justify-content: center; align-items: center; gap: 1rem; margin-top: 0.75rem;">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; width: 100%;">
+                    <button class="carousel-prev" style="background: #f0f0f0; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">←</button>
+                    <div class="carousel-indicator" style="font-size: 0.9rem; color: #666; font-weight: 500;">
+                        <span class="current-slide">1</span> / <span class="total-slides">4</span>
+                    </div>
+                    <button class="carousel-next" style="background: var(--secondary); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">→</button>
                 </div>
-                <button class="carousel-next" style="background: var(--secondary); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">→</button>
+                <a href="services.html" class="btn-see-all-mobile" style="background: var(--secondary); color: white; padding: 1rem 2rem; border-radius: 2rem; text-decoration: none; font-weight: 600; display: block; text-align: center; width: 100%; margin-top: 0.75rem;">See All Services</a>
             </div>
         </div>
     </section>

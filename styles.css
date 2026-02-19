@@ -1441,6 +1441,17 @@ section {
     }
     
     /* Services Section - 4 columns to carousel on mobile */
+    .services-section .services-header {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        margin-bottom: 3rem !important;
+    }
+    
+    .services-section .services-header .btn-see-all-services {
+        display: none !important;
+    }
+    
     .services-section .services-carousel {
         display: block !important;
         overflow: hidden !important;
@@ -1470,6 +1481,31 @@ section {
     
     .services-section .carousel-nav-mobile {
         display: flex !important;
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+        align-items: center !important;
+    }
+    
+    .services-section .carousel-nav-mobile > div:first-child {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 1rem !important;
+        width: 100% !important;
+    }
+    
+    .carousel-nav-mobile .btn-see-all-mobile {
+        background: var(--secondary) !important;
+        color: white !important;
+        padding: 1rem 2rem !important;
+        border-radius: 2rem !important;
+        text-decoration: none !important;
+        font-weight: 600 !important;
+        display: block !important;
+        text-align: center !important;
+        cursor: pointer !important;
+        width: 100% !important;
     }
     
     .carousel-prev:hover,
@@ -1492,13 +1528,6 @@ section {
         text-align: center !important;
         margin-left: auto !important;
         margin-right: auto !important;
-    }
-    
-    .services-section > .container > div:first-child {
-        flex-direction: column !important;
-        align-items: center !important;
-        gap: 1rem !important;
-        text-align: center !important;
     }
     
     .services-section .btn-primary-large {
