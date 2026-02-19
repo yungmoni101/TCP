@@ -322,13 +322,19 @@
 
                             <!-- Family Plans -->
                             <div class="form-group">
-                                <label class="form-label">Travel Plans <span style="color: #d32f2f;">*</span></label>
-                                <select name="accompanying_family" required class="form-input">
-                                    <option value="">-- Who will be traveling? --</option>
+                                <label class="form-label">Who will you be traveling with? <span style="color: #d32f2f;">*</span></label>
+                                <select name="accompanying_family" required class="form-input" id="family-select" onchange="toggleChildrenField()">
+                                    <option value="">-- Who will you be traveling with? --</option>
                                     <option value="Alone">Alone</option>
                                     <option value="With spouse">With spouse</option>
                                     <option value="With spouse and children">With spouse and children</option>
                                 </select>
+                            </div>
+
+                            <!-- Number of Children (Conditional) -->
+                            <div class="form-group" id="children-field" style="display: none;">
+                                <label class="form-label">Number of Children</label>
+                                <input type="number" name="number_of_children" class="form-input" placeholder="Enter number of children" min="1">
                             </div>
 
                             <!-- Previous Application -->
@@ -553,6 +559,17 @@
                 fileNameDiv.classList.add('show');
             } else {
                 fileNameDiv.classList.remove('show');
+            }
+        }
+
+        function toggleChildrenField() {
+            const familySelect = document.getElementById('family-select');
+            const childrenField = document.getElementById('children-field');
+            if (familySelect.value === 'With spouse and children') {
+                childrenField.style.display = 'block';
+            } else {
+                childrenField.style.display = 'none';
+                document.querySelector('input[name="number_of_children"]').value = '';
             }
         }
     </script>
