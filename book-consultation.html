@@ -332,7 +332,7 @@
                         <p style="color: #666; font-size: 1rem;">All fields marked with <span style="color: #d32f2f;">*</span> are required</p>
                     </div>
                     <div class="form-container">
-                        <form action="https://formspree.io/f/xqedzwwe" method="POST" enctype="multipart/form-data" style="display: grid; gap: 1.8rem;" onsubmit="handleFormSubmit(event);">
+                        <form enctype="multipart/form-data" style="display: grid; gap: 1.8rem;" onsubmit="handleFormSubmit(event);">
                             <!-- Row 1: Name & Email -->
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                                 <div class="form-group">
@@ -621,10 +621,32 @@
     <script src="mobile-menu.js"></script>
     <script>
         function handleFormSubmit(event) {
-            // Allow the form to submit to Formspree, then redirect to Calendly
-            setTimeout(function() {
-                window.location.href = 'https://calendly.com/your-calendly-link';
-            }, 1000);
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Submit to Formspree
+            fetch('https://formspree.io/f/xqedzwwe', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Successfully submitted to Formspree
+                    // Redirect to Calendly
+                    window.location.href = 'https://calendly.com/tcpimmigration/30min?month=2026-02';
+                } else {
+                    alert('There was an issue submitting the form. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error submitting the form. Please try again.');
+            });
         }
 
         function updateFileName(input) {
