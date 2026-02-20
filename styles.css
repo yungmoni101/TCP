@@ -877,6 +877,42 @@ section {
     text-align: center;
 }
 
+.service-hero.visiting {
+    background-image: url('visiting.jpeg');
+    background-size: cover;
+    background-position: center;
+}
+
+.service-hero.studying {
+    background-image: url('study.AVIF');
+    background-size: cover;
+    background-position: center;
+}
+
+.service-hero.pr {
+    background-image: url('pr.jpeg');
+    background-size: cover;
+    background-position: center;
+}
+
+.service-hero.working {
+    background-image: url('work.jpeg');
+    background-size: cover;
+    background-position: center;
+}
+
+.service-hero.spousal {
+    background-image: url('spousal.jpeg');
+    background-size: cover;
+    background-position: center;
+}
+
+.service-hero.family {
+    background-image: url('visiting.jpeg');
+    background-size: cover;
+    background-position: center;
+}
+
 .service-hero h1 {
     font-size: 3rem;
     margin-bottom: 1rem;
@@ -1210,6 +1246,11 @@ section {
     /* Ensure container doesn't exceed reasonable width on very large screens */
     .container {
         max-width: 1400px;
+    }
+    
+    /* Add more space for service hero on desktop */
+    .service-hero {
+        padding-top: 10rem;
     }
 }
 
