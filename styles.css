@@ -943,6 +943,12 @@ section {
     background-position: center;
 }
 
+.service-hero.longterm {
+    background-image: url('longterm.jpeg');
+    background-size: cover;
+    background-position: center;
+}
+
 .service-hero h1 {
     font-size: 3rem;
     margin-bottom: 1rem;
