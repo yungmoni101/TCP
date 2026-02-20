@@ -913,6 +913,36 @@ section {
     background-position: center;
 }
 
+.service-hero.business {
+    background-image: url('buisness.jpeg');
+    background-size: cover;
+    background-position: center;
+}
+
+.service-hero.citizenship {
+    background-image: url('citizen.jpeg');
+    background-size: cover;
+    background-position: center;
+}
+
+.service-hero.humanitarian {
+    background-image: url('human.jpeg');
+    background-size: cover;
+    background-position: center;
+}
+
+.service-hero.refugee {
+    background-image: url('refuges.jpeg');
+    background-size: cover;
+    background-position: center;
+}
+
+.service-hero.refusals {
+    background-image: url('refues.jpeg');
+    background-size: cover;
+    background-position: center;
+}
+
 .service-hero h1 {
     font-size: 3rem;
     margin-bottom: 1rem;
