@@ -504,20 +504,7 @@
                                 </select>
                             </div>
 
-                            <!-- File Upload -->
-                            <div class="form-group">
-                                <label class="form-label">Supporting Documents <span style="color: #999; font-weight: 400;">(Optional)</span></label>
-                                <p style="font-size: 0.9rem; color: #666; margin: 0 0 0.8rem 0;">You may upload any relevant documents that will help us understand your case better. This may include; Passport Copies, Resume (CV), Previous visa or permit approvals/refusals, Education Certificates, Employment Letters, Business Documents or Financial statements.</p>
-                                <div class="file-upload-wrapper">
-                                    <input type="file" name="decision_file" id="file-input" class="file-upload-input" onchange="updateFileName(this)">
-                                    <label for="file-input" class="file-upload-label">
-                                        <div class="file-upload-icon">📁</div>
-                                        <span class="file-upload-text">Upload Document</span>
-                                        <span class="file-upload-subtext">Click to browse or drag and drop</span>
-                                    </label>
-                                    <div class="file-name" id="file-name"></div>
-                                </div>
-                            </div>
+                            <!-- File Upload section removed -->
 
                             <!-- Message -->
                             <div class="form-group">
@@ -623,10 +610,8 @@
     <script>
         function handleFormSubmit(event) {
             event.preventDefault();
-            
             const form = event.target;
             const formData = new FormData(form);
-            
             // Submit to Formspree
             fetch('https://formspree.io/f/xqedzwwe', {
                 method: 'POST',
@@ -637,9 +622,15 @@
             })
             .then(response => {
                 if (response.ok) {
-                    // Successfully submitted to Formspree
-                    // Redirect to Calendly
-                    window.location.href = 'https://calendly.com/tcpimmigration/30min?month=2026-02';
+                    // Show thank you message
+                    form.style.display = 'none';
+                    const thankYou = document.createElement('div');
+                    thankYou.style.textAlign = 'center';
+                    thankYou.style.padding = '2rem';
+                    thankYou.style.fontSize = '1.2rem';
+                    thankYou.style.color = '#0d47a1';
+                    thankYou.innerHTML = '<h2>Thank you for submitting your consultation request!</h2><p>Your details have been sent. Our team will review your information and contact you soon with personalized advice.</p>';
+                    form.parentNode.appendChild(thankYou);
                 } else {
                     alert('There was an issue submitting the form. Please try again.');
                 }
