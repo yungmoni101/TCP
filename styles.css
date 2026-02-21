@@ -2020,20 +2020,61 @@ section {
     .review-card-mobile {
         display: none !important;
         animation: slideIn 0.4s ease-in-out;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
     
     .review-card-mobile.active {
         display: block !important;
     }
     
+    /* Ensure stars stay in one horizontal line */
+    .review-card-mobile .review-stars-mobile {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 0.3rem !important;
+        margin-bottom: 1.2rem !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-wrap: nowrap !important;
+        width: 100% !important;
+    }
+    
+    .review-card-mobile .review-stars-mobile span {
+        flex-shrink: 0 !important;
+        font-size: 1.3rem !important;
+        line-height: 1 !important;
+    }
+    
     .reviews-carousel {
         position: relative;
         width: 100%;
+        box-sizing: border-box;
     }
     
+    /* Navigation container - force on one line */
+    .reviews-carousel-mobile > div:last-of-type,
+    .review-carousel-mobile {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 0.75rem !important;
+        margin-top: 1.5rem !important;
+        flex-wrap: nowrap !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        min-width: 0 !important;
+    }
+    
+    /* Navigation flex layout - keep on one line */
     .review-carousel-prev,
     .review-carousel-next {
         transition: all 0.3s ease !important;
+        flex-shrink: 0 !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        width: 40px !important;
+        height: 40px !important;
     }
     
     .review-carousel-prev:hover,
@@ -2044,6 +2085,13 @@ section {
     .review-carousel-prev:active,
     .review-carousel-next:active {
         transform: scale(0.95) !important;
+    }
+    
+    .review-carousel-indicator {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+        min-width: fit-content !important;
+        padding: 0 0.5rem !important;
     }
     
     .explore-btn-mobile {
