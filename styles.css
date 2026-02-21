@@ -2004,12 +2004,60 @@ section {
     }
 }
 
-/* Hide elements on mobile */
+/* Mobile Reviews Carousel */
 @media (max-width: 768px) {
-  .hide-mobile {
-    display: none !important;
-  }
+    /* Hide desktop carousel, show mobile carousel */
+    .reviews-carousel-desktop {
+        display: none !important;
+    }
+    
+    .reviews-mobile-section {
+        display: block !important;
+        padding: 3rem 0 8rem 0 !important;
+    }
+    
+    /* Mobile carousel styling */
+    .review-card-mobile {
+        display: none !important;
+        animation: slideIn 0.4s ease-in-out;
+    }
+    
+    .review-card-mobile.active {
+        display: block !important;
+    }
+    
+    .reviews-carousel {
+        position: relative;
+        width: 100%;
+    }
+    
+    .review-carousel-prev,
+    .review-carousel-next {
+        transition: all 0.3s ease !important;
+    }
+    
+    .review-carousel-prev:hover,
+    .review-carousel-next:hover {
+        transform: scale(1.1) !important;
+    }
+    
+    .review-carousel-prev:active,
+    .review-carousel-next:active {
+        transform: scale(0.95) !important;
+    }
+    
+    .explore-btn-mobile {
+        width: 100% !important;
+    }
 }
+
+/* Keep desktop carousel visible on desktop */
+@media (min-width: 769px) {
+    .reviews-mobile-section {
+        display: none !important;
+    }
+}
+
 
 @media (max-width: 600px) {
   .peter-mobile-circle {

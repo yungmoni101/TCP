@@ -97,8 +97,47 @@ document.addEventListener('DOMContentLoaded', function() {
     if (nextBtn) {
         nextBtn.addEventListener('click', nextSlide);
     }
-    if (prevBtn) {
-        prevBtn.addEventListener('click', prevSlide);
+    // Reviews Carousel Functionality (Mobile)
+    const reviewsCarousel = document.querySelector('.reviews-carousel');
+    const reviewCards = reviewsCarousel ? reviewsCarousel.querySelectorAll('.review-card-mobile') : [];
+    const reviewPrevBtn = document.querySelector('.review-carousel-prev');
+    const reviewNextBtn = document.querySelector('.review-carousel-next');
+    const currentReviewSpan = document.querySelector('.current-review');
+    let currentReview = 0;
+    
+    function updateReviewCarousel() {
+        reviewCards.forEach((card, index) => {
+            card.classList.remove('active');
+            if (index === currentReview) {
+                card.classList.add('active');
+            }
+        });
+        if (currentReviewSpan) {
+            currentReviewSpan.textContent = currentReview + 1;
+        }
+    }
+    
+    function nextReview() {
+        currentReview = (currentReview + 1) % reviewCards.length;
+        updateReviewCarousel();
+    }
+    
+    function prevReview() {
+        currentReview = (currentReview - 1 + reviewCards.length) % reviewCards.length;
+        updateReviewCarousel();
+    }
+    
+    // Initialize review carousel on page load
+    if (reviewCards.length > 0) {
+        updateReviewCarousel();
+    }
+    
+    // Add event listeners
+    if (reviewNextBtn) {
+        reviewNextBtn.addEventListener('click', nextReview);
+    }
+    if (reviewPrevBtn) {
+        reviewPrevBtn.addEventListener('click', prevReview);
     }
 });
 
