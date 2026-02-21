@@ -2013,7 +2013,7 @@ section {
     
     .reviews-mobile-section {
         display: block !important;
-        padding: 3rem 0 8rem 0 !important;
+        padding: 1.5rem 0 8rem 0 !important;
     }
     
     /* Mobile carousel styling */
@@ -2056,6 +2056,7 @@ section {
     .reviews-carousel-mobile > div:last-of-type,
     .review-carousel-mobile {
         display: flex !important;
+        flex-direction: row !important;
         justify-content: center !important;
         align-items: center !important;
         gap: 0.75rem !important;
@@ -2096,6 +2097,10 @@ section {
     
     .explore-btn-mobile {
         width: 100% !important;
+    }
+    
+    .explore-btn {
+        display: none !important;
     }
 }
 

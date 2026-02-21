@@ -529,10 +529,24 @@
     </section>
 
     <!-- Client Feedback Section -->
-    <section style="padding: 6rem 0 13rem 0; background: white;">
+    <section style="padding: 6rem 0 2rem 0; background: white;" class="client-feedback-section" ontouchstart="">
+        <style>
+            @media (max-width: 768px) {
+                .client-feedback-section {
+                    padding: 1rem 0 0.5rem 0 !important;
+                }
+            }
+        </style>
         <div class="container">
             <!-- Header -->
             <div class="feedback-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem;">
+                <style>
+                    @media (max-width: 768px) {
+                        .feedback-header {
+                            margin-bottom: 1rem !important;
+                        }
+                    }
+                </style>
                 <h2 style="font-size: 3rem; color: #333; font-weight: 700; line-height: 1.2; margin: 0;">Client Feedback<br>Highlights</h2>
                 <a href="https://www.google.com/search?sca_esv=529d083b40021c7f&hl=en-NG&authuser=1&sxsrf=ANbL-n45g1_eHeJgVGwJPVlhXyQ5sgoAtA:1771540237730&q=tcp+immigration+services+ltd.+calgary+reviews&uds=ALYpb_mKYSU0AKi6Ztjyo1PJOcGfnDzM2ThfCsv2nfNc3CyXIbjEBP94T9w6urfL_Nn3RInyb8ciOT6Adx8TE9dX8oe5rwZkoJWwpF1KFixaaQBfPSZVxB0zx3SLs1dvGQElc71MzIIzKleJaVE_TmCQZFbo3QPvp_e5RiCxEO1x_nTD6Cct_WMQec0MTccMn5ytqS46mK1ptv-Wj7DSsZf_IUncUkqOwpYws1lsmqDQfKhndcnTbKS38jSR9Iukz2sDkQAvn77VmEt-7mkBtvztYsQKKlHPVCw8WNyLQWkllDTmKy3SboCFCZGgDeesxjd2L-TNc-Hv63TmWtBtZo_KyqE-OtCyQnIFX_kwkNatoZKPmL7jryt2kbcJ3a_yHQQFyPQBi7TE5-EHK6QcHycJx3oPWCtb0RT6l3_OF7a7taaG-zct67I&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOWW90kCo9hsoPbNni_k-40gh31-7fh6oGQ2zf3lLvB1Q1QEP8Aeu-Cldg4qb6DOe2DVPVlJF4V9haeoKmQiqdIeAUC2m2s-MvKZOKmiern3NobarVxYUTaHMPOet-IcMLa1NvuA%3D&sa=X&ved=2ahUKEwij3szUzeaSAxVP2AIHHcngAg0Qk8gLegQIGhAB&ictx=1&biw=440&bih=796&dpr=3" class="explore-btn" style="background: var(--secondary); color: white; padding: 1rem 2.5rem; border-radius: 3rem; text-decoration: none; font-weight: 600; font-size: 1rem; transition: all 0.3s ease; display: inline-block;">Explore More</a>
             </div>
@@ -658,6 +672,10 @@
                 }
                 
                 @media (max-width: 768px) {
+                    .reviews-carousel-desktop {
+                        margin-top: 0 !important;
+                    }
+                    
                     .carousel-wrapper {
                         border-radius: 1rem !important;
                         width: 100%;
@@ -722,6 +740,11 @@
                         width: 24px !important;
                         height: 24px !important;
                     }
+                    
+                    /* Reduce spacing between carousel and indicators */
+                    .reviews-carousel-desktop > div:last-child {
+                        margin-top: 0.5rem !important;
+                    }
                 }
                 
                 @media (max-width: 480px) {
@@ -751,6 +774,11 @@
                     .carousel-slide div div:last-child p {
                         font-size: 0.9rem !important;
                     }
+                    
+                    /* Reduce spacing between carousel and indicators */
+                    .reviews-carousel-desktop > div:last-child {
+                        margin-top: 0.3rem !important;
+                    }
                 }
             </style>
 
@@ -759,7 +787,7 @@
                     .feedback-header {
                         flex-direction: column !important;
                         align-items: flex-start !important;
-                        gap: 2rem !important;
+                        gap: 0.5rem !important;
                     }
                     
                     .feedback-header h2 {
@@ -769,7 +797,7 @@
                     .explore-btn {
                         width: 100% !important;
                         text-align: center !important;
-                        margin-top: 2rem !important;
+                        margin-top: 0.5rem !important;
                     }
                     
                     .review-stars {
@@ -820,7 +848,7 @@
     </section>
 
     <!-- Mobile Only Reviews Carousel -->
-    <section style="padding: 6rem 0 13rem 0; background: white; display: none;" class="reviews-mobile-section">
+    <section style="padding: 2rem 0 1rem 0; background: white; display: none;" class="reviews-mobile-section">
         <div class="container">
             <!-- Testimonial Carousel - Mobile only -->
             <div class="reviews-carousel-mobile" style="position: relative; width: 100%; margin: 0 auto; display: flex; flex-direction: column; align-items: center;">
