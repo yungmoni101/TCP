@@ -2124,3 +2124,10 @@ section {
     margin-right: auto;
   }
 }
+
+/* Hide specific images on mobile devices */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
