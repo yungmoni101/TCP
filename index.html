@@ -523,7 +523,9 @@
                         <strong>Thank you!</strong> Your message has been sent successfully. We'll get back to you soon.
                     </div>
                     
-                    <form action="https://formspree.io/f/xqedzwwe" method="POST" target="hidden_iframe" onsubmit="showSuccess(); return true;" style="display: grid; gap: 1.5rem;">
+                    <form action="https://api.web3forms.com/submit" method="POST" onsubmit="showSuccess(); return true;" style="display: grid; gap: 1.5rem;">
+                        <input type="hidden" name="access_key" value="7afb6976-1c6e-4ea2-8bb5-639974156cef">
+                        <input type="hidden" name="form_name" value="Contact Form - Homepage">
                         <!-- Name and Phone -->
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                             <div>
@@ -1018,7 +1020,9 @@
                     </div>
                 </div>
                 
-                <form action="https://formspree.io/f/xqedzwwe" method="POST" target="hidden_iframe" onsubmit="showNewsletterSuccess(); return true;" style="display: flex; gap: 0; background: white; border-radius: 3rem; padding: 0.5rem; min-width: 400px;">
+                <form action="https://api.web3forms.com/submit" method="POST" onsubmit="showNewsletterSuccess(); return true;" style="display: flex; gap: 0; background: white; border-radius: 3rem; padding: 0.5rem; min-width: 400px;">
+                    <input type="hidden" name="access_key" value="7afb6976-1c6e-4ea2-8bb5-639974156cef">
+                    <input type="hidden" name="form_name" value="Newsletter Signup">
                     <input type="email" name="email" placeholder="Enter your email" required style="flex: 1; border: none; outline: none; padding: 1rem 1.5rem; font-size: 1rem; border-radius: 3rem; background: transparent;">
                     <input type="hidden" name="form_type" value="newsletter">
                     <button type="submit" style="background: var(--primary); color: white; padding: 1rem 2.5rem; border: none; border-radius: 3rem; font-weight: 600; font-size: 1rem; cursor: pointer; white-space: nowrap; transition: all 0.3s ease;">Subscribe</button>
@@ -1178,7 +1182,7 @@
             
             // Reset form after a short delay
             setTimeout(function() {
-                document.querySelector('form[action*="formspree"]').reset();
+                document.querySelector('form[action*="web3forms"]').reset();
             }, 100);
             
             // Hide success message after 5 seconds

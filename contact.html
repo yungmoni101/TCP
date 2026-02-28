@@ -166,7 +166,9 @@
                             <strong>Thank you!</strong> Your inquiry has been submitted successfully. Redirecting you to book your consultation appointment...
                         </div>
                         
-                        <form action="https://formspree.io/f/xqedzwwe" method="POST" target="hidden_iframe" onsubmit="showSuccess(); return true;">
+                        <form action="https://api.web3forms.com/submit" method="POST" onsubmit="showSuccess(); return true;">
+                            <input type="hidden" name="access_key" value="7afb6976-1c6e-4ea2-8bb5-639974156cef">
+                            <input type="hidden" name="form_name" value="Contact Form">
                             <div class="form-group">
                                 <label for="name">Full Name *</label>
                                 <input type="text" id="name" name="name" required>

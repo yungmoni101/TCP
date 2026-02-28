@@ -363,6 +363,8 @@
                     </div>
                     <div class="form-container">
                         <form enctype="multipart/form-data" style="display: grid; gap: 1.8rem;" onsubmit="handleFormSubmit(event);">
+                            <input type="hidden" name="access_key" value="7afb6976-1c6e-4ea2-8bb5-639974156cef">
+                            <input type="hidden" name="form_name" value="Consultation Request Form">
                             <!-- Row 1: Name & Email -->
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                                 <div class="form-group">
@@ -641,8 +643,8 @@
             event.preventDefault();
             const form = event.target;
             const formData = new FormData(form);
-            // Submit to Formspree
-            fetch('https://formspree.io/f/xqedzwwe', {
+            // Submit to Web3Forms
+            fetch('https://api.web3forms.com/submit', {
                 method: 'POST',
                 body: formData,
                 headers: {
