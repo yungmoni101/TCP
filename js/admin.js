@@ -154,9 +154,9 @@
       <div class="meta">/${l.slug} · ${fromMeta.symbol} ${l.source_currency} → ${TARGET} · ${payCount} payment(s)${bankTag}</div>
       <div class="link-url" id="url-${l.id}">${url}</div>
       <div class="actions">
-        <button class="btn-primary" data-act="copy">Copy link</button>
-        <button class="btn-primary" data-act="open" style="background:var(--primary);">Manage</button>
-        <button class="btn-hero-outline" data-act="delete" style="color:var(--secondary);border:1px solid var(--secondary);">Delete</button>
+        <button class="btn-hero-outline link-act" data-act="copy" style="color:var(--primary);border:1px solid var(--primary);">Copy link</button>
+        <button class="btn-primary link-act" data-act="open">Manage</button>
+        <button class="btn-hero-outline link-act" data-act="delete" style="color:var(--secondary);border:1px solid var(--secondary);">Delete</button>
       </div>`;
     el.querySelector('[data-act="copy"]').addEventListener('click', () => {
       navigator.clipboard.writeText(url); const b = el.querySelector('[data-act="copy"]'); b.textContent = 'Copied!'; setTimeout(() => (b.textContent = 'Copy link'), 1500);
@@ -361,12 +361,15 @@
         <p class="sub">/pay.html?slug=${esc(link.slug)}</p>
         <h3 style="color:var(--primary);margin:1rem 0 .5rem;">Exchange rate</h3>
         <p class="text-muted small">Fixed rate for this link. Leave blank to use the live market rate. The customer pays using this rate.</p>
-        <div class="flex gap-2" style="align-items:center;">
-          <span>1 CAD =</span>
-          <input type="number" name="rate_override" id="m-rate" step="any" value="${link.rate_override != null ? link.rate_override : ''}" placeholder="live" style="max-width:170px;">
-          <span class="text-muted">${esc(link.source_currency)}</span>
+        <div class="rate-box">
+          <div class="flex gap-2" style="align-items:center;">
+            <span style="font-weight:600;">1 ${TARGET} =</span>
+            <input type="number" name="rate_override" id="m-rate" step="any" value="${link.rate_override != null ? link.rate_override : ''}" placeholder="live" style="max-width:170px;">
+            <span class="text-muted">${esc(link.source_currency)}</span>
+          </div>
+          <p class="small text-muted" id="m-live" style="margin:.6rem 0 0;"></p>
+          <p class="small" id="m-markup" style="margin:.3rem 0 0;"></p>
         </div>
-        <p class="small text-secondary" id="m-markup"></p>
         <h3 style="color:var(--primary);margin:1.5rem 0 .5rem;">Bank transfer details</h3>
         <p class="text-muted small">Customers see these when they pick "pay with bank transfer".</p>
         <form id="bank-form" class="mt-2">
@@ -395,16 +398,31 @@
     // live markup readout for the rate field
     const mRate = m.querySelector('#m-rate');
     const mMarkup = m.querySelector('#m-markup');
+    const mLiveEl = m.querySelector('#m-live');
     let mLive = null;
     (async () => {
-      try { const live = await window.getFxRate(link.source_currency, TARGET); mLive = 1 / live; } catch {}
+      try {
+        const live = await window.getFxRate(link.source_currency, TARGET); // CAD per 1 source
+        mLive = 1 / live; // source per 1 CAD
+        mLiveEl.textContent = `Live market rate: 1 ${TARGET} ≈ ${mLive.toLocaleString(undefined, { maximumFractionDigits: 4 })} ${link.source_currency}`;
+      } catch {
+        mLive = null;
+        mLiveEl.textContent = 'Live market rate unavailable — enter your rate manually.';
+      }
       recalcM();
     })();
     function recalcM() {
       const v = parseFloat(mRate.value);
-      if (!v || !mLive) { mMarkup.textContent = ''; return; }
+      if (!v) { mMarkup.textContent = ''; mMarkup.className = 'small'; return; }
+      if (!mLive) { mMarkup.textContent = 'Enter a fixed rate above to lock it in.'; mMarkup.className = 'small text-muted'; return; }
       const pct = (v - mLive) / mLive * 100;
-      mMarkup.textContent = `Markup vs live: ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+      if (Math.abs(pct) < 0.005) {
+        mMarkup.textContent = 'Same as live market rate — no markup.';
+        mMarkup.className = 'small text-muted';
+      } else {
+        mMarkup.textContent = `Markup vs live: ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+        mMarkup.className = `small ${pct >= 0 ? 'rate-up' : 'rate-down'}`;
+      }
     }
     mRate.addEventListener('input', recalcM);
 

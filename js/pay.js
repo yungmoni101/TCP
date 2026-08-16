@@ -26,6 +26,79 @@
 
   const TARGET = window.TARGET_CURRENCY; // CAD
 
+  /* ---------- persistence across reloads ----------
+     FORM_KEY  : customer + amount + step while the user is still filling the
+                 form (steps 1-3). 10-minute TTL, refreshed on every render so
+                 it only expires after 10 min of *inactivity* since the last
+                 step change.
+     BANK_KEY  : everything needed for the bank step (customer, amount, cad,
+                 rate) PLUS the 60-minute deadline. Set the moment the user
+                 reaches the bank step and cleared when the timer ends, when
+                 the payment is done, or when they hit Cancel. */
+  let FORM_KEY = null, BANK_KEY = null;
+  const FORM_TTL_MS = 10 * 60 * 1000;
+
+  function setPersistKeys(slug) {
+    FORM_KEY = 'paylink:form:' + slug;
+    BANK_KEY = 'paylink:bank:' + slug;
+  }
+
+  function loadFormPersist() {
+    try {
+      const raw = localStorage.getItem(FORM_KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      if (!d.expiresAt || d.expiresAt <= Date.now()) { localStorage.removeItem(FORM_KEY); return null; }
+      return d;
+    } catch { try { localStorage.removeItem(FORM_KEY); } catch {} return null; }
+  }
+
+  function saveFormPersist() {
+    if (state.step > 3) return; // only for pre-bank steps
+    try {
+      localStorage.setItem(FORM_KEY, JSON.stringify({
+        step: state.step,
+        customer: state.customer,
+        amount: state.amount,
+        expiresAt: Date.now() + FORM_TTL_MS,
+      }));
+    } catch {}
+  }
+
+  function clearFormPersist() { try { localStorage.removeItem(FORM_KEY); } catch {} }
+
+  function loadBankPersist() {
+    try {
+      const raw = localStorage.getItem(BANK_KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      if (!d.timerEndsAt || d.timerEndsAt <= Date.now()) { localStorage.removeItem(BANK_KEY); return null; }
+      return d;
+    } catch { try { localStorage.removeItem(BANK_KEY); } catch {} return null; }
+  }
+
+  function saveBankPersist() {
+    try {
+      localStorage.setItem(BANK_KEY, JSON.stringify({
+        timerEndsAt: state.timerEndsAt,
+        customer: state.customer,
+        amount: state.amount,
+        cad: state.cad,
+        rate: state.rate,
+      }));
+    } catch {}
+  }
+
+  function clearBankPersist() { try { localStorage.removeItem(BANK_KEY); } catch {} }
+  function clearAllPersist() { clearFormPersist(); clearBankPersist(); }
+
+  // Abandon the whole payment: wipe any saved progress and leave for home.
+  // Used by the Cancel button (form steps) and Cancel payment button (bank step).
+  function cancelPayment() {
+    clearAllPersist();
+    location.href = 'index.html';
+  }
+
   function showError(msg) {
     loadingEl.classList.add('hidden');
     appEl.classList.add('hidden');
@@ -37,6 +110,7 @@
   async function init() {
     const slug = new URLSearchParams(location.search).get('slug');
     if (!slug) return showError('No payment link specified in the URL.');
+    setPersistKeys(slug);
 
     if (!window.isPaylinkConfigured()) {
       return showError('This payment system is not configured yet. The site administrator needs to connect Supabase (see js/config.js and README.md).');
@@ -74,6 +148,27 @@
 
       loadingEl.classList.add('hidden');
       appEl.classList.remove('hidden');
+
+      // ---- restore an in-progress payment from a previous (re)load ----
+      const bankPersist = loadBankPersist();
+      if (bankPersist) {
+        // Mid bank step: resume the 60-minute timer with whatever time was left.
+        state.customer = bankPersist.customer || state.customer;
+        state.amount = bankPersist.amount != null ? bankPersist.amount : state.amount;
+        state.cad = bankPersist.cad != null ? bankPersist.cad : null;
+        state.rate = bankPersist.rate != null ? bankPersist.rate : null;
+        state.timerEndsAt = bankPersist.timerEndsAt;
+        state.step = 4;
+        render();
+        return;
+      }
+      const formPersist = loadFormPersist();
+      if (formPersist) {
+        // Still filling the form: jump back to the exact step with their details.
+        state.step = Math.min(Math.max(formPersist.step || 1, 1), 3);
+        state.customer = formPersist.customer || state.customer;
+        state.amount = formPersist.amount != null ? formPersist.amount : state.amount;
+      }
       render();
     } catch (e) {
       showError('Could not reach the payment service. Make sure the site is served over http:// and Supabase is connected. (' + (e && e.message ? e.message : e) + ')');
@@ -108,7 +203,8 @@
         <div class="form-group"><label>Phone *</label><input name="phone" required value="${esc(state.customer.phone)}" placeholder="+1 555 1234"></div>
         <div class="form-group"><label>Address *</label><textarea name="address" required placeholder="221B Baker Street, London">${esc(state.customer.address)}</textarea></div>
         <button type="submit" class="btn-primary w-full" style="margin-top:1rem;">Continue</button>
-      </form>`;
+      </form>
+      <button class="pay-cancel" id="cancel-flow" type="button">Cancel payment</button>`;
     $('#f-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
@@ -121,14 +217,19 @@
       };
       state.step = 2; render();
     });
+    $('#cancel-flow').addEventListener('click', cancelPayment);
+    saveFormPersist();
   }
 
   function renderConvert() {
     const from = state.link.source_currency;
     const fromMeta = window.CURRENCIES[from];
+    // The "Title" the admin sets IS the full heading the customer sees.
+    // (Previously we prepended "Send money to " which forced admins to type
+    // only a short merchant name. Now they can type the complete headline.)
     appEl.innerHTML = `
       ${stepsIndicator()}
-      <h2 class="pay-step-title">Send money to ${esc(state.link.title)}</h2>
+      <h2 class="pay-step-title">${esc(state.link.title) || 'Make a payment'}</h2>
       <p class="pay-step-sub">Enter the amount you'll send. We'll show the CAD equivalent.</p>
       <div class="converter">
         <div class="conv-row">
@@ -147,11 +248,13 @@
         </div>
       </div>
       <p class="conv-rate" id="rate-line"></p>
-      <button id="proceed" class="btn-primary w-full" disabled>Proceed</button>`;
+      <button id="proceed" class="btn-primary w-full" disabled>Proceed</button>
+      <button class="pay-cancel" id="cancel-flow" type="button">Cancel payment</button>`;
 
     const amt = $('#amount');
     const recalc = async () => {
       state.amount = amt.value; // persist what the customer typed (was stuck at default '300')
+      saveFormPersist();
       const num = parseFloat(amt.value);
       if (!num || num <= 0) { state.cad = null; $('#cad').value = ''; $('#proceed').disabled = true; $('#rate-line').textContent = ''; return; }
       let cadPerSource, perCad;
@@ -170,7 +273,9 @@
     };
     amt.addEventListener('input', recalc);
     $('#proceed').addEventListener('click', () => { state.step = 3; render(); });
+    $('#cancel-flow').addEventListener('click', cancelPayment);
     recalc();
+    saveFormPersist();
   }
 
   function renderMethod() {
@@ -185,12 +290,19 @@
       <button class="method" id="bank">
         <span><span class="m-title">Pay with bank transfer</span><br><span class="m-sub">Use your banking app or in-branch</span></span>
         <span style="color:var(--primary);font-size:1.4rem;">›</span>
-      </button>`;
+      </button>
+      <button class="pay-cancel" id="cancel-flow" type="button">Cancel payment</button>`;
     $('#card').addEventListener('click', () => alert('Card payments are currently not available. Please use bank transfer.'));
     $('#bank').addEventListener('click', () => {
+      // Reaching the bank step: drop the 10-min form persistence and start a
+      // fresh 60-minute timer (persisted so a reload mid-bank-step resumes it).
+      clearFormPersist();
       state.timerEndsAt = Date.now() + 60 * 60 * 1000;
+      saveBankPersist();
       state.step = 4; render();
     });
+    $('#cancel-flow').addEventListener('click', cancelPayment);
+    saveFormPersist();
   }
 
   function renderBank() {
@@ -230,10 +342,11 @@
       <div class="bank-details">
         ${rows.map(([k, v]) => `<div class="row"><span class="k">${k}</span><span class="v">${esc(v)} <button class="copy-btn" data-copy="${esc(v)}">Copy</button></span></div>`).join('')}
       </div>
-      ${b.instructions ? `<div class="bank-note">${esc(b.instructions)}</div>` : `<div class="bank-note">No additional instructions from the merchant. Please use your order reference as the transfer memo.</div>`}
+      ${b.instructions && String(b.instructions).trim() ? `<div class="bank-note">${esc(b.instructions)}</div>` : ''}
       <input type="file" id="receipt" accept="image/*,application/pdf" class="hidden">
       <div class="dropzone" id="dropzone">📄 Click to upload your payment receipt<br><small class="text-muted">JPG, PNG or PDF</small></div>
-      <div id="upload-status" class="small text-muted mt-1"></div>`;
+      <div id="upload-status" class="small text-muted mt-1"></div>
+      <button class="pay-cancel" id="cancel-payment" type="button">Cancel payment</button>`;
 
     // copy buttons — flip to "Copied" for 1s so the customer knows it worked
     appEl.querySelectorAll('.copy-btn').forEach((btn) =>
@@ -247,13 +360,22 @@
     );
 
     // timer countdown
+    $('#cancel-payment').addEventListener('click', cancelPayment);
     if (!expired) {
       const timer = setInterval(() => {
         const rem = Math.max(0, state.timerEndsAt - Date.now());
         const s = Math.floor(rem / 1000);
         const tEl = $('#timer');
         tEl.querySelector('.t-time').textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-        if (rem <= 0) { clearInterval(timer); tEl.classList.add('expired'); tEl.querySelector('.t-label').textContent = 'Expired'; tEl.querySelector('.t-time').textContent = '00:00'; }
+        if (rem <= 0) {
+          clearInterval(timer);
+          tEl.classList.add('expired');
+          tEl.querySelector('.t-label').textContent = 'Expired';
+          tEl.querySelector('.t-time').textContent = '00:00';
+          // Time's up: wipe saved progress and send them back to the home page.
+          clearAllPersist();
+          setTimeout(() => { location.href = 'index.html'; }, 1800);
+        }
       }, 1000);
     }
 
@@ -294,6 +416,7 @@
           data.publicUrl,
           from
         );
+        clearAllPersist();
         state.step = 5; render();
       } catch (e) {
         drop.classList.remove('has-file');

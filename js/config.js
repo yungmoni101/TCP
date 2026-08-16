@@ -11,7 +11,7 @@ window.PAYLINK_CONFIG = {
 
   // ----- Admin only (treat as secrets) -----
   // Single password to open the admin dashboard, like an env key.
-  ADMIN_PASSWORD: 'MARLAINS',
+  ADMIN_PASSWORD: 'marlains',
   // Service-role key (bypasses RLS). It is visible in the browser source, so keep
   // the admin page URL private and use a strong ADMIN_PASSWORD. For higher
   // security later, move admin writes behind a serverless function instead.

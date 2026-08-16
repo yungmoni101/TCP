@@ -262,6 +262,89 @@
 /* Copy button "Copied" feedback state */
 .copy-btn.copied { color: #2e7d32; }
 
+/* Cancel / abandon-payment button (form steps + bank step) */
+.pay-cancel {
+  display: block;
+  width: 100%;
+  margin-top: 1.25rem;
+  background: none;
+  border: 0;
+  color: var(--text-light);
+  font-size: .9rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: color .15s;
+}
+.pay-cancel:hover { color: var(--secondary); text-decoration: underline; }
+
+/* Exchange-rate editor (admin "Manage" modal) */
+.rate-box {
+  background: #f4f6fa;
+  border: 1px solid #e5e9f0;
+  border-radius: .85rem;
+  padding: 1rem;
+  margin: .25rem 0 .5rem;
+}
+.rate-box input {
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: .55rem;
+  padding: .45rem .6rem;
+  font-size: .95rem;
+  width: 100%;
+}
+.rate-up { color: #b00020; font-weight: 600; }   /* markup for the business */
+.rate-down { color: #2e7d32; font-weight: 600; } /* discount vs live */
+
+/* Admin link card — balanced buttons + cleaner meta line */
+.link-card { transition: box-shadow .15s, transform .15s; }
+.link-card:hover { box-shadow: 0 6px 22px rgba(0,0,0,.10); transform: translateY(-1px); }
+.link-card .meta {
+  font-size: .85rem; line-height: 1.55; margin-bottom: .9rem;
+}
+.link-card .meta { color: var(--text-light); }
+.link-card .actions {
+  display: flex; flex-wrap: wrap; gap: .5rem; align-items: stretch;
+  margin-top: .25rem;
+}
+.link-card .actions .link-act {
+  flex: 1 1 auto; min-width: 92px;
+  padding: .55rem .9rem; font-size: .88rem;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.link-card .link-url {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .78rem; line-height: 1.45;
+}
+
+/* Mobile responsive — pay + admin */
+@media (max-width: 640px) {
+  .pay-shell { padding: 1rem .75rem 3rem; }
+  .pay-card { padding: 1.25rem; border-radius: .85rem; }
+  .admin-shell { padding: 1.25rem .85rem 3rem; }
+  .admin-toolbar { flex-direction: column; align-items: stretch; gap: .85rem; }
+  .admin-toolbar h1 { font-size: 1.45rem; }
+  .admin-toolbar .flex { flex-direction: column; align-items: stretch; gap: .6rem; }
+  .admin-toolbar .flex > * { width: 100%; }
+  .link-grid { grid-template-columns: 1fr; gap: .85rem; }
+  .link-card { padding: 1rem; }
+  .link-card .actions .link-act { width: 100%; }
+  .modal { padding: 1.25rem; border-radius: .85rem; max-height: 95vh; }
+  .modal h2 { font-size: 1.15rem; }
+  .modal h3 { font-size: 1rem; }
+  .rate-box { padding: .85rem; }
+  .rate-box input { font-size: 1rem; }
+  .bank-timer .t-time { font-size: 1.75rem; }
+  .bank-details .row { font-size: .88rem; padding: .6rem .85rem; }
+  .pay-done { padding: 1.75rem 1.25rem; }
+  .pay-done-title { font-size: 1.2rem; }
+}
+@media (max-width: 380px) {
+  .pay-step-title { font-size: 1.1rem; }
+  .conv-amount { font-size: 1.35rem; }
+  .bank-timer .t-time { font-size: 1.55rem; }
+}
+
 /* Receipt-done / thank-you section (after the customer uploads their receipt) */
 .pay-done {
   text-align: center;
