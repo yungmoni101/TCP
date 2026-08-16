@@ -196,24 +196,21 @@
     appEl.innerHTML = `
       ${stepsIndicator()}
       <h2 class="pay-step-title">Your details</h2>
-      <p class="pay-step-sub">We'll use these to confirm your payment.</p>
+      <p class="pay-step-sub">Enter your full name as shown on your passport or official documents.</p>
       <form id="f-form">
-        <div class="form-group"><label>Full name *</label><input name="name" required value="${esc(state.customer.name)}" placeholder="Ada Lovelace"></div>
-        <div class="form-group"><label>Email *</label><input name="email" type="email" required value="${esc(state.customer.email)}" placeholder="ada@example.com"></div>
-        <div class="form-group"><label>Phone *</label><input name="phone" required value="${esc(state.customer.phone)}" placeholder="+1 555 1234"></div>
-        <div class="form-group"><label>Address *</label><textarea name="address" required placeholder="221B Baker Street, London">${esc(state.customer.address)}</textarea></div>
+        <div class="form-group"><label>Full name</label><input name="name" required value="${esc(state.customer.name)}" placeholder="Ada Lovelace"></div>
         <button type="submit" class="btn-primary w-full" style="margin-top:1rem;">Continue</button>
       </form>
       <button class="pay-cancel" id="cancel-flow" type="button">Cancel payment</button>`;
     $('#f-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
-      const email = fd.get('email').toString().trim();
-      if (!/^\S+@\S+\.\S+$/.test(email)) return alert('Please enter a valid email.');
+      // Only the full name is collected from the client. Email, phone and
+      // address are intentionally left empty so the existing DB insert and
+      // notification code paths keep working without any schema change.
       state.customer = {
         name: fd.get('name').toString().trim(),
-        email, phone: fd.get('phone').toString().trim(),
-        address: fd.get('address').toString().trim(),
+        email: '', phone: '', address: '',
       };
       state.step = 2; render();
     });

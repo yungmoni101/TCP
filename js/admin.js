@@ -181,6 +181,8 @@
         <p class="sub">Set the currency your customer pays in. They'll see the CAD equivalent at checkout.</p>
         <form id="create-form">
           <div class="form-group"><label>Title *</label><input name="title" required placeholder="Consultation fee — John Doe"></div>
+          <div class="form-group"><label>Link slug (optional)</label><input name="slug" placeholder="e.g. test  →  pay.html?slug=test">
+            <p class="small text-muted">Used in the payment URL. Leave blank to auto-generate. Letters, numbers and dashes only.</p></div>
           <div class="form-group" style="position:relative;"><label>Customer pays in</label>
             <input type="text" id="cur-search" placeholder="Search currency or country (e.g. Nigeria, Naira, NGN)" autocomplete="off">
             <input type="hidden" name="source_currency" id="cur-value">
@@ -316,29 +318,47 @@
       // A value equal to the live rate is treated as "use live" (no fixed lock).
       if (override != null && livePerCad && Math.abs(override - livePerCad) / livePerCad < 1e-4) override = null;
       if (override != null && livePerCad) markup = (override - livePerCad) / livePerCad * 100;
-      // Auto-generate a short random slug (no manual slug field). Retry on the
-      // rare chance of a collision with an existing link.
+      // Slug: use the admin's manual value if supplied, otherwise auto-generate.
       const genSlug = () => Math.random().toString(36).slice(2, 10).toLowerCase();
-      let slug = genSlug();
-      let res = await sb.from('payment_links').insert({
+      const slugRaw = fd.get('slug').toString().trim();
+      let slug;
+      if (slugRaw) {
+        slug = slugify(slugRaw);
+        if (!slug) {
+          m.querySelector('#create-err').textContent = 'Slug must contain at least one letter or number.';
+          m.querySelector('#create-err').classList.remove('hidden');
+          return;
+        }
+      } else {
+        slug = genSlug();
+      }
+
+      const insertPayload = () => ({
         slug, title,
         source_currency: fd.get('source_currency').toString(),
         target_currency: TARGET,
         rate_override: override,
         rate_markup_pct: markup,
       });
+
+      let res = await sb.from('payment_links').insert(insertPayload());
+
+      // A manual slug that collides must NOT be silently overwritten — tell the
+      // admin so they can pick a different one.
+      if (res.error && /duplicate|23505/i.test(res.error.message || '') && slugRaw) {
+        m.querySelector('#create-err').textContent = `The slug "${slug}" is already in use. Please choose a different one.`;
+        m.querySelector('#create-err').classList.remove('hidden');
+        return;
+      }
+
+      // Auto-generated slugs just retry on the rare collision.
       let attempts = 0;
       while (res.error && /duplicate|23505/i.test(res.error.message || '') && attempts < 4) {
         slug = genSlug();
-        res = await sb.from('payment_links').insert({
-          slug, title,
-          source_currency: fd.get('source_currency').toString(),
-          target_currency: TARGET,
-          rate_override: override,
-          rate_markup_pct: markup,
-        });
+        res = await sb.from('payment_links').insert(insertPayload());
         attempts++;
       }
+
       const error = res.error;
       if (error) { m.querySelector('#create-err').textContent = error.message; m.querySelector('#create-err').classList.remove('hidden'); return; }
       m.remove(); loadAll();
