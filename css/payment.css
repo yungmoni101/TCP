@@ -258,3 +258,73 @@
 .cur-code { font-weight: 700; color: #222; width: 3.4rem; }
 .cur-name { color: #555; font-size: .9rem; }
 .cur-empty { padding: .75rem; color: #888; font-size: .9rem; }
+
+/* Copy button "Copied" feedback state */
+.copy-btn.copied { color: #2e7d32; }
+
+/* Receipt-done / thank-you section (after the customer uploads their receipt) */
+.pay-done {
+  text-align: center;
+  padding: 2.5rem 1.75rem;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.pay-done-icon {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #2e7d32;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin: 0 auto 1.25rem;
+  box-shadow: 0 6px 18px rgba(46, 125, 50, 0.18);
+}
+.pay-done-title {
+  color: var(--primary);
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 0 0 .5rem;
+  line-height: 1.3;
+}
+.pay-done-sub {
+  color: var(--text-light);
+  font-size: .95rem;
+  margin: 0 auto 1.5rem;
+  max-width: 440px;
+}
+.pay-summary {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid #e8ecf1;
+  border-radius: .85rem;
+  padding: .25rem 1.25rem;
+  margin: 0 auto 1.5rem;
+  max-width: 440px;
+  text-align: left;
+}
+.pay-summary .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: .7rem 0;
+  border-bottom: 1px dashed #e8ecf1;
+}
+.pay-summary .row:last-child { border-bottom: 0; }
+.pay-summary .k { color: var(--text-light); font-size: .88rem; }
+.pay-summary .v { font-weight: 700; color: var(--primary); font-size: .98rem; text-align: right; word-break: break-word; }
+.pay-done-note {
+  color: var(--text-light);
+  font-size: .88rem;
+  margin: 0 auto 1.5rem;
+  max-width: 460px;
+  line-height: 1.55;
+}
+.pay-done-actions {
+  display: flex;
+  justify-content: center;
+  gap: .75rem;
+}

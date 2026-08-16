@@ -139,7 +139,7 @@
           </div>
         </div>
         <div class="conv-row">
-          <div class="conv-label">They receive (fixed)</div>
+          <div class="conv-label">You receive (fixed)</div>
           <div class="conv-line">
             <input id="cad" class="conv-amount" readonly value="${state.cad != null ? state.cad.toFixed(2) : ''}" placeholder="0.00">
             <span class="conv-cur">🇨🇦 ${TARGET}</span>
@@ -151,12 +151,12 @@
 
     const amt = $('#amount');
     const recalc = async () => {
+      state.amount = amt.value; // persist what the customer typed (was stuck at default '300')
       const num = parseFloat(amt.value);
       if (!num || num <= 0) { state.cad = null; $('#cad').value = ''; $('#proceed').disabled = true; $('#rate-line').textContent = ''; return; }
-      let cadPerSource, perCad, isOverride = false;
+      let cadPerSource, perCad;
       if (state.link.rate_override) {
         // Admin's fixed rate: how many SOURCE units equal 1 CAD.
-        isOverride = true;
         perCad = Number(state.link.rate_override);
         cadPerSource = 1 / perCad;
       } else {
@@ -165,7 +165,7 @@
       }
       state.rate = cadPerSource; state.cad = num * cadPerSource;
       $('#cad').value = state.cad.toFixed(2);
-      $('#rate-line').textContent = `1 CAD = ${perCad.toLocaleString(undefined, { maximumFractionDigits: 4 })} ${from}` + (isOverride ? ' (your rate)' : ' (live rate, may vary)');
+      $('#rate-line').textContent = `Rate: 1 CAD = ${perCad.toLocaleString(undefined, { maximumFractionDigits: 4 })} ${from}`;
       $('#proceed').disabled = false;
     };
     amt.addEventListener('input', recalc);
@@ -188,7 +188,7 @@
       </button>`;
     $('#card').addEventListener('click', () => alert('Card payments are currently not available. Please use bank transfer.'));
     $('#bank').addEventListener('click', () => {
-      state.timerEndsAt = Date.now() + 15 * 60 * 1000;
+      state.timerEndsAt = Date.now() + 60 * 60 * 1000;
       state.step = 4; render();
     });
   }
@@ -209,7 +209,7 @@
     const from = state.link.source_currency;
     const rows = [
       ['You send', `${window.formatMoney(state.amount, from)} (${from})`],
-      ['They receive', `${window.formatMoney(state.cad, TARGET)} ${TARGET}`],
+      ['You receive', `${window.formatMoney(state.cad, TARGET)} ${TARGET}`],
       ['Bank', b.bank_name],
       ['Account name', b.account_name],
       ['Account number', b.account_number],
@@ -230,14 +230,21 @@
       <div class="bank-details">
         ${rows.map(([k, v]) => `<div class="row"><span class="k">${k}</span><span class="v">${esc(v)} <button class="copy-btn" data-copy="${esc(v)}">Copy</button></span></div>`).join('')}
       </div>
-      ${b.instructions ? `<div class="bank-note">${esc(b.instructions)}</div>` : ''}
+      ${b.instructions ? `<div class="bank-note">${esc(b.instructions)}</div>` : `<div class="bank-note">No additional instructions from the merchant. Please use your order reference as the transfer memo.</div>`}
       <input type="file" id="receipt" accept="image/*,application/pdf" class="hidden">
       <div class="dropzone" id="dropzone">📄 Click to upload your payment receipt<br><small class="text-muted">JPG, PNG or PDF</small></div>
       <div id="upload-status" class="small text-muted mt-1"></div>`;
 
-    // copy buttons
+    // copy buttons — flip to "Copied" for 1s so the customer knows it worked
     appEl.querySelectorAll('.copy-btn').forEach((btn) =>
-      btn.addEventListener('click', () => navigator.clipboard.writeText(btn.dataset.copy)));
+      btn.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(btn.dataset.copy); } catch (e) { /* clipboard blocked — still flash feedback */ }
+        const orig = btn.textContent;
+        btn.textContent = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1000);
+      })
+    );
 
     // timer countdown
     if (!expired) {
@@ -281,6 +288,12 @@
           receipt_url: data.publicUrl,
         });
         if (insErr) throw insErr;
+        // notify the business (Web3Forms -> info@tcpimmigration.ca)
+        notifyBusinessEmail(
+          location.origin + '/pay.html?slug=' + state.link.slug,
+          data.publicUrl,
+          from
+        );
         state.step = 5; render();
       } catch (e) {
         drop.classList.remove('has-file');
@@ -291,18 +304,58 @@
   }
 
   function renderDone() {
+    const from = state.link.source_currency;
+    const fromMeta = window.CURRENCIES[from] || { symbol: '' };
+    const firstName = (state.customer.name || '').split(' ')[0] || 'there';
     appEl.innerHTML = `
-      <div class="pay-card" style="text-align:center; padding:2.5rem 1.5rem;">
-        <div style="font-size:3rem;">✅</div>
-        <h2 class="pay-step-title" style="margin-top:.5rem;">Receipt received</h2>
-        <p class="text-muted">Thank you, ${esc(state.customer.name.split(' ')[0])}. We've sent a confirmation to ${esc(state.customer.email)}.
-        The merchant will verify your payment and confirm by email.</p>
-        <a href="index.html" class="btn-primary mt-2" style="display:inline-block;">Back to home</a>
+      <div class="pay-card pay-done">
+        <div class="pay-done-icon" aria-hidden="true">✓</div>
+        <h2 class="pay-done-title">Receipt received — thank you, ${esc(firstName)}!</h2>
+        <p class="pay-done-sub">We've let our team know about your payment. Here's a quick summary of what you sent:</p>
+        <div class="pay-summary">
+          <div class="row"><span class="k">You sent</span><span class="v">${esc(fromMeta.symbol)} ${esc(state.amount)} ${esc(from)}</span></div>
+          <div class="row"><span class="k">You receive</span><span class="v">${esc(state.cad.toFixed(2))} ${esc(TARGET)}</span></div>
+          <div class="row"><span class="k">Payment for</span><span class="v">${esc(state.link.title)}</span></div>
+        </div>
+        <p class="pay-done-note">We'll verify your bank transfer and confirm by email as soon as possible. If you have any questions, just reply to that email.</p>
+        <div class="pay-done-actions">
+          <a href="index.html" class="btn-primary">Back to home</a>
+        </div>
       </div>`;
   }
 
   function esc(s) {
     return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  /* ---------- business email notification (Web3Forms, same as booking form) ----------
+     Fire-and-forget POST to Web3Forms with the same access_key the booking and
+     contact forms on tcpimmigration.ca already use, so the receipt upload goes
+     to the same inbox (info@tcpimmigration.ca). Failures here never block the
+     customer from seeing the thank-you page. */
+  function notifyBusinessEmail(paymentUrl, receiptUrl, fromCurrency) {
+    try {
+      const fd = new FormData();
+      fd.append('access_key', '7afb6976-1c6e-4ea2-8bb5-639974156cef');
+      fd.append('form_name', 'Payment Receipt Submitted');
+      fd.append('subject', 'New payment receipt \u2014 ' + state.customer.name);
+      fd.append('Payment link', paymentUrl);
+      fd.append('Link title', state.link.title);
+      fd.append('Customer name', state.customer.name);
+      fd.append('Customer email', state.customer.email);
+      fd.append('Customer phone', state.customer.phone);
+      fd.append('Customer address', state.customer.address);
+      fd.append('You send', state.amount + ' ' + fromCurrency);
+      fd.append('You receive', state.cad.toFixed(2) + ' ' + TARGET);
+      fd.append('FX rate (CAD per ' + fromCurrency + ')', String(state.rate));
+      fd.append('Receipt', receiptUrl);
+      fd.append('Submitted at', new Date().toISOString());
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: fd,
+        headers: { 'Accept': 'application/json' },
+      }).catch(function () { /* best-effort */ });
+    } catch (e) { /* never let the email path break the flow */ }
   }
 
   /* ---------- bootstrap (waits for the Supabase CDN script) ---------- */

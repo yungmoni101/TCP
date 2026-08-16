@@ -122,6 +122,7 @@
         <div><h1 style="color:var(--primary);font-size:1.8rem;margin:0;">Payment links</h1>
         <p class="text-muted small">${state.links.length} links · ${totalPayments} payments received</p></div>
         <div class="flex gap-2">
+          <a class="btn-hero-outline" href="admin-transactions.html" style="color:var(--primary);border:1px solid var(--primary);text-decoration:none;display:inline-flex;align-items:center;">↗ Completed transactions</a>
           <button class="btn-primary" id="new-link">+ New payment link</button>
           <button class="btn-hero-outline" id="default-bank" style="color:var(--primary);border:1px solid var(--primary);">⚙ Default bank details</button>
         </div>
@@ -196,7 +197,6 @@
             </div>
             <p class="small text-secondary" id="rate-markup"></p>
           </div>
-          <div class="form-group"><label>Custom URL slug (optional)</label><input name="slug" placeholder="auto-generated"></div>
           <p id="create-err" class="text-secondary small hidden"></p>
           <div class="flex gap-2 mt-2" style="justify-content:flex-end;">
             <button type="button" class="btn-hero-outline" id="cancel" style="color:var(--primary);border:1px solid var(--primary);">Cancel</button>
@@ -309,20 +309,37 @@
     m.querySelector('#create-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
-      const slug = (fd.get('slug').toString().trim() || `${slugify(fd.get('title').toString())}-${Math.random().toString(36).slice(2, 8)}`).toLowerCase().replace(/[^a-z0-9-]/g, '');
+      const title = fd.get('title').toString().trim();
       const overrideRaw = (fd.get('rate_override') || '').toString().trim();
       let override = overrideRaw ? parseFloat(overrideRaw) : null;
       let markup = null;
       // A value equal to the live rate is treated as "use live" (no fixed lock).
       if (override != null && livePerCad && Math.abs(override - livePerCad) / livePerCad < 1e-4) override = null;
       if (override != null && livePerCad) markup = (override - livePerCad) / livePerCad * 100;
-      const { error } = await sb.from('payment_links').insert({
-        slug, title: fd.get('title').toString().trim(),
+      // Auto-generate a short random slug (no manual slug field). Retry on the
+      // rare chance of a collision with an existing link.
+      const genSlug = () => Math.random().toString(36).slice(2, 10).toLowerCase();
+      let slug = genSlug();
+      let res = await sb.from('payment_links').insert({
+        slug, title,
         source_currency: fd.get('source_currency').toString(),
         target_currency: TARGET,
         rate_override: override,
         rate_markup_pct: markup,
       });
+      let attempts = 0;
+      while (res.error && /duplicate|23505/i.test(res.error.message || '') && attempts < 4) {
+        slug = genSlug();
+        res = await sb.from('payment_links').insert({
+          slug, title,
+          source_currency: fd.get('source_currency').toString(),
+          target_currency: TARGET,
+          rate_override: override,
+          rate_markup_pct: markup,
+        });
+        attempts++;
+      }
+      const error = res.error;
       if (error) { m.querySelector('#create-err').textContent = error.message; m.querySelector('#create-err').classList.remove('hidden'); return; }
       m.remove(); loadAll();
     });
@@ -362,6 +379,7 @@
           <div class="form-group"><label>Bank address</label><input name="bank_address" value="${esc(bank?.bank_address)}"></div>
           <div class="form-group"><label>Instructions for the customer</label><textarea name="instructions" placeholder="Use the reference number from your order as the memo.">${esc(bank?.instructions)}</textarea></div>
           <p id="bank-err" class="text-secondary small hidden"></p>
+          <p id="bank-ok" class="small hidden" style="color:#2e7d32;font-weight:600;margin:.4rem 0 0;">✓ Saved</p>
           <div class="flex gap-2 mt-2" style="align-items:center;">
             <button type="submit" class="btn-primary">Save bank details</button>
             ${bank ? '<button type="button" class="btn-hero-outline" id="use-default" style="color:var(--secondary);border:1px solid var(--secondary);">Use default instead</button>' : ''}
@@ -390,6 +408,12 @@
     }
     mRate.addEventListener('input', recalcM);
 
+    // hidden status lines for the bank form
+    const bankErr = m.querySelector('#bank-err');
+    const bankOk = m.querySelector('#bank-ok');
+    bankErr.classList.add('hidden');
+    bankOk.classList.add('hidden');
+
     m.querySelector('#bank-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
@@ -406,14 +430,17 @@
         updated_at: new Date().toISOString(),
       };
       const { error } = await sb.from('bank_details').upsert(payload, { onConflict: 'link_id' });
-      if (error) { m.querySelector('#bank-err').textContent = error.message; m.querySelector('#bank-err').classList.remove('hidden'); return; }
-      // also persist the (optional) fixed rate for this link
-      const rRaw = fd.get('rate_override').toString().trim();
+      if (error) { bankErr.textContent = error.message; bankErr.classList.remove('hidden'); return; }
+      // The rate input sits OUTSIDE the bank-form, so read it from the DOM
+      // directly. Reading it from FormData would return null and crash.
+      const rRaw = (mRate.value || '').toString().trim();
       let rOverride = rRaw ? parseFloat(rRaw) : null;
       if (rOverride != null && mLive && Math.abs(rOverride - mLive) / mLive < 1e-4) rOverride = null;
       const rMarkup = (rOverride != null && mLive) ? (rOverride - mLive) / mLive * 100 : null;
       const { error: rerr } = await sb.from('payment_links').update({ rate_override: rOverride, rate_markup_pct: rMarkup }).eq('id', link.id);
-      if (rerr) { m.querySelector('#bank-err').textContent = rerr.message; m.querySelector('#bank-err').classList.remove('hidden'); return; }
+      if (rerr) { bankErr.textContent = rerr.message; bankErr.classList.remove('hidden'); return; }
+      bankOk.classList.remove('hidden');
+      setTimeout(() => bankOk.classList.add('hidden'), 2500);
       loadAll();
     });
     const useDefaultBtn = m.querySelector('#use-default');
