@@ -258,7 +258,8 @@
       const v = parseFloat(rateOverride.value);
       if (!v || !livePerCad) { rateMarkup.textContent = ''; return; }
       const pct = (v - livePerCad) / livePerCad * 100;
-      rateMarkup.textContent = `Markup vs live: ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+      if (Math.abs(pct) < 0.005) rateMarkup.textContent = 'Same as live market rate';
+      else rateMarkup.textContent = `Markup vs live: ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
     }
 
     async function updateRateUI(code) {
@@ -271,7 +272,11 @@
         livePerCad = null;
         rateLive.textContent = 'Could not fetch the live rate — enter your rate manually.';
       }
-      if (!rateOverride.value) rateOverride.value = livePerCad != null ? round4(livePerCad) : '';
+      // Always reset the editable field to the new live rate when the
+      // currency changes — the old value was for a different currency.
+      // Leaving it untouched = "use live" (the submit handler treats a
+      // value matching live as no override).
+      rateOverride.value = livePerCad != null ? round4(livePerCad) : '';
       recalcMarkup();
     }
 
