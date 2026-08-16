@@ -240,7 +240,7 @@
           </div>
         </div>
         <div class="conv-row">
-          <div class="conv-label">You receive (fixed)</div>
+          <div class="conv-label">We receive (fixed)</div>
           <div class="conv-line">
             <input id="cad" class="conv-amount" readonly value="${state.cad != null ? state.cad.toFixed(2) : ''}" placeholder="0.00">
             <span class="conv-cur">🇨🇦 ${TARGET}</span>
