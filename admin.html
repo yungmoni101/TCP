@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Payment Links | TCP Immigration</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/payment.css">
+    <script>
+      /* Supabase loader with jsdelivr -> unpkg fallback.
+         Exposes window.__supabaseReady (a Promise) so admin.js / pay.js can
+         wait for the library to finish loading before they run. The promise
+         resolves once Supabase is available on window.supabase, and rejects
+         only if every CDN fails (ad-blocker / firewall / outage). */
+      (function () {
+        window.__supabaseReady = new Promise(function (resolve, reject) {
+          var sources = [
+            'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+            'https://unpkg.com/@supabase/supabase-js@2'
+          ];
+          var i = 0;
+          function tryNext() {
+            if (i >= sources.length) {
+              reject(new Error('All Supabase CDNs failed to load.'));
+              return;
+            }
+            var src = sources[i++];
+            var s = document.createElement('script');
+            s.src = src;
+            s.async = true;
+            s.onload = function () {
+              if (window.supabase && window.supabase.createClient) resolve(window.supabase);
+              else reject(new Error('Supabase script loaded but createClient is missing.'));
+            };
+            s.onerror = function () { tryNext(); };
+            document.head.appendChild(s);
+          }
+          tryNext();
+        });
+      })();
+    </script>
+</head>
+<body>
+    <header class="top-bar">
+        <div class="container">
+            <div class="contact-info">
+                <span class="welcome-text">TCP Immigration — Admin</span>
+                <span class="divider">|</span>
+                <a href="index.html">← Back to site</a>
+            </div>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand"><a href="index.html"><img src="logo.png" alt="TCP" class="logo"></a></div>
+            <div id="auth-area"></div>
+        </div>
+    </nav>
+
+    <section style="background:#f9f9f9; padding: 2.5rem 0; min-height: 70vh;">
+        <div class="admin-shell">
+            <div id="auth-screen"></div>
+            <div id="dashboard" class="hidden"></div>
+        </div>
+    </section>
+
+    <footer style="background: #E3F2FD; padding: 4rem 0 2rem 0;">
+        <div class="container">
+            <div style="border-top: 1px solid #d0d0d0; padding-top: 2rem;">
+                <p style="color: #666; margin: 0;">© Copyright 2026 TCP Immigration Services. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/fx.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

@@ -134,5 +134,43 @@ If you need modifications or have questions about the website, contact TCP Immig
 
 ---
 
+## 💳 Payment Links (PayLink)
+
+This site includes a self-serve **payment link** system so clients can pay immigration
+fees via bank transfer, with live currency conversion to CAD.
+
+### What it does
+- **Admin dashboard** (`admin.html`) — create/delete payment links, set the currency the
+  client pays in (USD, NGN, EUR, GBP), configure the bank account they transfer to, and
+  review submitted payments + receipts.
+- **Client payment page** (`pay.html?slug=XXXX`) — client enters their name/email/phone/address,
+  types an amount, sees the live **CAD** equivalent, picks **Pay with bank transfer**
+  (card is shown as "currently not available"), then gets a 15-minute timer with the bank
+  details and an upload-receipt box.
+
+### Setup (one-time)
+1. Create a free project at <https://supabase.com>.
+2. Open **SQL Editor → New query**, paste the contents of `supabase/schema.sql`, and run it.
+3. Go to **Project Settings → API** and copy the **Project URL** and the **anon / public key**.
+4. Open `js/config.js` and paste those values into `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+   (These are browser-safe public keys — fine to ship in a static site.)
+5. In the Supabase dashboard, create the first admin: **Authentication → Users → Add user**
+   (or sign up from `admin.html`). Every signed-in user has full admin access.
+
+### Files
+- `pay.html` / `js/pay.js` — client payment flow
+- `admin.html` / `js/admin.js` — admin dashboard
+- `js/config.js` — Supabase credentials (edit me)
+- `js/fx.js` — free live FX rates (Frankfurter API, no key needed)
+- `css/payment.css` — payment + admin styles
+- `supabase/schema.sql` — database + storage + security rules
+
+### Currency
+The business always receives **CAD**. In the admin dashboard you choose the currency the
+client *pays in* (e.g. USD or NGN); the client sees the converted CAD amount before paying.
+Rates come from the free Frankfurter API and are cached for 1 hour.
+
+---
+
 **Created**: 2024
 **License**: Copyright © 2024 TCP Immigration Services Ltd. All rights reserved.

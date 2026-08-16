@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make a Payment - TCP Immigration Services</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/payment.css">
+    <script>
+      /* Supabase loader with jsdelivr -> unpkg fallback.
+         Exposes window.__supabaseReady (a Promise) so pay.js can wait for the
+         library to finish loading before it runs. Resolves once Supabase is
+         available on window.supabase; rejects only if every CDN fails. */
+      (function () {
+        window.__supabaseReady = new Promise(function (resolve, reject) {
+          var sources = [
+            'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+            'https://unpkg.com/@supabase/supabase-js@2'
+          ];
+          var i = 0;
+          function tryNext() {
+            if (i >= sources.length) {
+              reject(new Error('All Supabase CDNs failed to load.'));
+              return;
+            }
+            var src = sources[i++];
+            var s = document.createElement('script');
+            s.src = src;
+            s.async = true;
+            s.onload = function () {
+              if (window.supabase && window.supabase.createClient) resolve(window.supabase);
+              else reject(new Error('Supabase script loaded but createClient is missing.'));
+            };
+            s.onerror = function () { tryNext(); };
+            document.head.appendChild(s);
+          }
+          tryNext();
+        });
+      })();
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="top-bar">
+        <div class="container">
+            <div class="contact-info">
+                <span class="welcome-text">Hello! Welcome to TCP.</span>
+                <span class="divider">|</span>
+                <span>☎ Mon - Sat: 8:00AM - 6:00PM</span>
+                <span class="divider">|</span>
+                <a href="mailto:info@tcpimmigration.ca">✉ info@tcpimmigration.ca</a>
+            </div>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html"><img src="logo.png" alt="TCP Immigration Services" class="logo"></a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="our-team.html">Our Team</a></li>
+                <li class="dropdown">
+                    <a href="services.html">Our Services <span class="dropdown-icon">▾</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="service-visiting.html">Visiting Canada</a></li>
+                        <li><a href="service-studying.html">Studying in Canada</a></li>
+                        <li><a href="service-working.html">Working in Canada</a></li>
+                        <li><a href="service-pr.html">Permanent Residence</a></li>
+                        <li><a href="service-family.html">Family Reunification</a></li>
+                        <li><a href="service-spousal.html">Spousal Sponsorship</a></li>
+                        <li><a href="service-business.html">Business & Investment</a></li>
+                        <li><a href="service-citizenship.html">Citizenship & PR Cards</a></li>
+                        <li><a href="service-humanitarian.html">Humanitarian & Compassionate</a></li>
+                        <li><a href="service-refugee.html">Refugee & Asylum</a></li>
+                        <li><a href="service-refusals.html">Refusals & Complex Cases</a></li>
+                        <li><a href="service-longterm.html">Long-Term Planning</a></li>
+                    </ul>
+                </li>
+                <li><a href="process.html">Our Process</a></li>
+                <li><a href="faqs.html">FAQs</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section style="background:#f9f9f9; padding: 3rem 0;">
+        <div class="pay-shell">
+            <!-- Loading / error states -->
+            <div id="pay-loading" class="pay-card">Loading payment details…</div>
+            <div id="pay-error" class="pay-card hidden"></div>
+
+            <!-- The flow is rendered here by js/pay.js -->
+            <div id="pay-app" class="hidden"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background: #E3F2FD; padding: 6rem 0 2rem 0;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 4rem; margin-bottom: 3rem;">
+                <div>
+                    <div><img src="logo.png" alt="TCP Immigration Services" style="height: 110px;"></div>
+                    <p style="color: #666; margin-top: -15px; line-height: 1.8; max-width: 380px;">Begin Your Global Adventure With Trusted Immigration Specialists</p>
+                </div>
+                <div>
+                    <h4 style="color: #333; font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Explore Links</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 1rem;"><a href="about.html" style="color: #666; text-decoration: none;">About us</a></li>
+                        <li style="margin-bottom: 1rem;"><a href="services.html" style="color: #666; text-decoration: none;">Our Services</a></li>
+                        <li style="margin-bottom: 1rem;"><a href="process.html" style="color: #666; text-decoration: none;">How it Works</a></li>
+                        <li style="margin-bottom: 1rem;"><a href="contact.html" style="color: #666; text-decoration: none;">Contact us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: #333; font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Our Address</h4>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 1rem;">TCP Immigration Services Ltd</p>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 1rem;">220 4 Ave SE #230, Calgary, AB T2G 4X3, Canada</p>
+                    <p style="color: #666; line-height: 1.8;">info@tcpimmigration.ca</p>
+                </div>
+            </div>
+            <div style="border-top: 1px solid #d0d0d0; padding-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                <p style="color: #666; margin: 0;">© Copyright 2026 All Rights Reserved.</p>
+                <div style="display: flex; gap: 2rem;">
+                    <a href="#" style="color: #666; text-decoration: none;">Privacy</a>
+                    <a href="#" style="color: #666; text-decoration: none;">& Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/fx.js"></script>
+    <script src="js/pay.js"></script>
+</body>
+</html>
