@@ -318,7 +318,7 @@
     const from = state.link.source_currency;
     const rows = [
       ['You send', `${window.formatMoney(state.amount, from)} (${from})`],
-      ['You receive', `${window.formatMoney(state.cad, TARGET)} ${TARGET}`],
+      ['We receive', `${window.formatMoney(state.cad, TARGET)} ${TARGET}`],
       ['Bank', b.bank_name],
       ['Account name', b.account_name],
       ['Account number', b.account_number],
