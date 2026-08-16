@@ -191,7 +191,7 @@
             <p class="small text-muted" id="rate-live"></p>
             <div class="flex gap-2" style="align-items:center;">
               <span>1 CAD =</span>
-              <input type="number" id="rate-override" step="any" inputmode="decimal" placeholder="live" style="max-width:170px;">
+              <input type="number" name="rate_override" id="rate-override" step="any" inputmode="decimal" placeholder="live" style="max-width:170px;">
               <span id="rate-code" class="text-muted"></span>
             </div>
             <p class="small text-secondary" id="rate-markup"></p>
@@ -310,7 +310,7 @@
       e.preventDefault();
       const fd = new FormData(e.target);
       const slug = (fd.get('slug').toString().trim() || `${slugify(fd.get('title').toString())}-${Math.random().toString(36).slice(2, 8)}`).toLowerCase().replace(/[^a-z0-9-]/g, '');
-      const overrideRaw = fd.get('rate_override').toString().trim();
+      const overrideRaw = (fd.get('rate_override') || '').toString().trim();
       let override = overrideRaw ? parseFloat(overrideRaw) : null;
       let markup = null;
       // A value equal to the live rate is treated as "use live" (no fixed lock).
