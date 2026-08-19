@@ -20,7 +20,7 @@
   // Supabase client + shared state (initialised inside start()).
   let sb;
   let TARGET;
-  const state = { links: [], bankByLink: {}, paymentsByLink: {}, defaultBank: null, editing: null, openLink: null, mode: 'signin' };
+  const state = { links: [], bankByLink: {}, cryptoByLink: {}, paymentsByLink: {}, defaultBank: null, defaultCrypto: null, editing: null, openLink: null, mode: 'signin' };
 
   const esc = (s) =>
     String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -98,15 +98,18 @@
     state.links = links || [];
     if (!state.links.length) { renderDashboard(); return; }
     const ids = state.links.map((l) => l.id);
-    const [bRes, pRes, dRes] = await Promise.all([
+    const [bRes, pRes, dRes, cRes, cdRes] = await Promise.all([
       sb.from('bank_details').select('*').in('link_id', ids),
       sb.from('payments').select('*').in('link_id', ids).order('created_at', { ascending: false }),
       sb.from('default_bank_details').select('*').eq('id', 'default').maybeSingle(),
+      sb.from('crypto_details').select('*').in('link_id', ids),
+      sb.from('default_crypto_details').select('*').eq('id', 'default').maybeSingle(),
     ]);
     const bMap = {}; (bRes.data || []).forEach((b) => (bMap[b.link_id] = b));
     const pMap = {}; (pRes.data || []).forEach((p) => { if (p.link_id) (pMap[p.link_id] ||= []).push(p); });
-    state.links.forEach((l) => { bMap[l.id] = bMap[l.id] || null; });
-    state.bankByLink = bMap; state.paymentsByLink = pMap; state.defaultBank = dRes.data || null;
+    const cMap = {}; (cRes.data || []).forEach((c) => (cMap[c.link_id] = c));
+    state.links.forEach((l) => { bMap[l.id] = bMap[l.id] || null; cMap[l.id] = cMap[l.id] || null; });
+    state.bankByLink = bMap; state.cryptoByLink = cMap; state.paymentsByLink = pMap; state.defaultBank = dRes.data || null; state.defaultCrypto = cdRes.data || null;
     renderDashboard();
   }
 
@@ -125,11 +128,13 @@
           <a class="btn-hero-outline" href="admin-transactions.html" style="color:var(--primary);border:1px solid var(--primary);text-decoration:none;display:inline-flex;align-items:center;">↗ Completed transactions</a>
           <button class="btn-primary" id="new-link">+ New payment link</button>
           <button class="btn-hero-outline" id="default-bank" style="color:var(--primary);border:1px solid var(--primary);">⚙ Default bank details</button>
+          <button class="btn-hero-outline" id="default-crypto" style="color:var(--primary);border:1px solid var(--primary);">⚙ Default crypto details</button>
         </div>
       </div>
       <div class="link-grid" id="grid"></div>`;
     $('#new-link').addEventListener('click', openCreateModal);
     $('#default-bank').addEventListener('click', openDefaultBankModal);
+    $('#default-crypto').addEventListener('click', openDefaultCryptoModal);
     const grid = $('#grid');
     if (!state.links.length) {
       grid.innerHTML = `<div class="pay-card text-muted">No links yet. Click <strong>New payment link</strong> to create your first one.</div>`;
@@ -199,6 +204,12 @@
             </div>
             <p class="small text-secondary" id="rate-markup"></p>
           </div>
+          <hr style="border:none;border-top:1px solid var(--ink-200,#e5e5e5);margin:1rem 0;">
+          <p class="small text-muted">Crypto (optional) — wallet addresses for this link. Leave blank to use the default Binance account.</p>
+          <div class="form-group"><label>Binance ID</label><input name="binance_id" value="${esc(state.defaultCrypto?.binance_id)}" placeholder="173274353"></div>
+          <div class="flex gap-2"><div class="form-group" style="flex:1"><label>TRC20 wallet address</label><input name="trc20_address" value="${esc(state.defaultCrypto?.trc20_address)}" placeholder="TRC20 address"></div>
+          <div class="form-group" style="flex:1"><label>BEP20 wallet address</label><input name="bep20_address" value="${esc(state.defaultCrypto?.bep20_address)}" placeholder="BEP20 address"></div></div>
+          <div class="form-group"><label>Instructions for the customer</label><textarea name="crypto_instructions" placeholder="Add a memo / reference if needed.">${esc(state.defaultCrypto?.instructions)}</textarea></div>
           <p id="create-err" class="text-secondary small hidden"></p>
           <div class="flex gap-2 mt-2" style="justify-content:flex-end;">
             <button type="button" class="btn-hero-outline" id="cancel" style="color:var(--primary);border:1px solid var(--primary);">Cancel</button>
@@ -361,6 +372,27 @@
 
       const error = res.error;
       if (error) { m.querySelector('#create-err').textContent = error.message; m.querySelector('#create-err').classList.remove('hidden'); return; }
+
+      // Save a per-link crypto override if the admin entered any crypto fields.
+      const newLink = (res.data && res.data[0]) || null;
+      if (newLink) {
+        const binanceId = fd.get('binance_id').toString().trim();
+        const trc20 = fd.get('trc20_address').toString().trim();
+        const bep20 = fd.get('bep20_address').toString().trim();
+        const cryptoInstr = fd.get('crypto_instructions').toString().trim();
+        if (binanceId || trc20 || bep20 || cryptoInstr) {
+          try {
+            const { error: cErr } = await sb.from('crypto_details').insert({
+              link_id: newLink.id,
+              binance_id: binanceId || null,
+              trc20_address: trc20 || null,
+              bep20_address: bep20 || null,
+              instructions: cryptoInstr || null,
+            });
+            if (cErr) console.error('[admin] crypto save failed', cErr);
+          } catch (e) { console.error('[admin] crypto save failed', e); }
+        }
+      }
       m.remove(); loadAll();
     });
   }
@@ -372,6 +404,8 @@
     m.className = 'modal-backdrop';
     const bank = state.bankByLink[link.id] || null;
     const payments = state.paymentsByLink[link.id] || [];
+    const crypto = state.cryptoByLink[link.id] || null;
+    const hasCrypto = Boolean(crypto);
     m.innerHTML = `
       <div class="modal">
         <div class="flex justify-between items-center">
@@ -406,6 +440,20 @@
           <div class="flex gap-2 mt-2" style="align-items:center;">
             <button type="submit" class="btn-primary">Save bank details</button>
             ${bank ? '<button type="button" class="btn-hero-outline" id="use-default" style="color:var(--secondary);border:1px solid var(--secondary);">Use default instead</button>' : ''}
+          </div>
+        </form>
+        <h3 style="color:var(--primary);margin:1.5rem 0 .5rem;">Crypto (Binance) details</h3>
+        <p class="text-muted small">${hasCrypto ? 'This link uses its own crypto wallet.' : 'Falls back to the default Binance account.'} Shown when the customer picks "Pay with Crypto".</p>
+        <form id="crypto-form" class="mt-2">
+          <div class="form-group"><label>Binance ID</label><input name="binance_id" value="${esc(crypto?.binance_id)}" placeholder="173274353"></div>
+          <div class="flex gap-2"><div class="form-group" style="flex:1"><label>TRC20 address</label><input name="trc20_address" value="${esc(crypto?.trc20_address)}"></div>
+          <div class="form-group" style="flex:1"><label>BEP20 address</label><input name="bep20_address" value="${esc(crypto?.bep20_address)}"></div></div>
+          <div class="form-group"><label>Instructions for the customer</label><textarea name="instructions" placeholder="Add a memo / reference if needed.">${esc(crypto?.instructions)}</textarea></div>
+          <p id="crypto-err" class="text-secondary small hidden"></p>
+          <p id="crypto-ok" class="small hidden" style="color:#2e7d32;font-weight:600;margin:.4rem 0 0;">✓ Saved</p>
+          <div class="flex gap-2 mt-2" style="align-items:center;">
+            <button type="submit" class="btn-primary">Save crypto details</button>
+            ${hasCrypto ? '<button type="button" class="btn-hero-outline" id="use-default-crypto" style="color:var(--secondary);border:1px solid var(--secondary);">Use default instead</button>' : ''}
           </div>
         </form>
         <h3 style="color:var(--primary);margin:1.5rem 0 .5rem;">Payments received (${payments.length})</h3>
@@ -490,6 +538,41 @@
         m.remove();
       });
     }
+
+    // ---- crypto (Binance) details ----
+    const cryptoErr = m.querySelector('#crypto-err');
+    const cryptoOk = m.querySelector('#crypto-ok');
+    if (cryptoErr) cryptoErr.classList.add('hidden');
+    if (cryptoOk) cryptoOk.classList.add('hidden');
+    const cryptoForm = m.querySelector('#crypto-form');
+    if (cryptoForm) {
+      cryptoForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const payload = {
+          link_id: link.id,
+          binance_id: fd.get('binance_id').toString().trim() || null,
+          trc20_address: fd.get('trc20_address').toString().trim() || null,
+          bep20_address: fd.get('bep20_address').toString().trim() || null,
+          instructions: fd.get('instructions').toString().trim() || null,
+          updated_at: new Date().toISOString(),
+        };
+        const { error } = await sb.from('crypto_details').upsert(payload, { onConflict: 'link_id' });
+        if (error) { cryptoErr.textContent = error.message; cryptoErr.classList.remove('hidden'); return; }
+        cryptoOk.classList.remove('hidden');
+        setTimeout(() => cryptoOk.classList.add('hidden'), 2500);
+        loadAll();
+      });
+    }
+    const useDefCryptoBtn = m.querySelector('#use-default-crypto');
+    if (useDefCryptoBtn) {
+      useDefCryptoBtn.addEventListener('click', async () => {
+        if (!confirm('Stop using a custom crypto wallet for this link and fall back to the default Binance account?')) return;
+        await sb.from('crypto_details').delete().eq('link_id', link.id);
+        loadAll();
+        m.remove();
+      });
+    }
   }
 
   /* ---------- default bank details (global) ---------- */
@@ -538,6 +621,49 @@
       };
       const { error } = await sb.from('default_bank_details').upsert(payload, { onConflict: 'id' });
       if (error) { m.querySelector('#default-err').textContent = error.message; m.querySelector('#default-err').classList.remove('hidden'); return; }
+      loadAll();
+      m.remove();
+    });
+  }
+
+  /* ---------- default crypto (Binance) details (global) ---------- */
+
+  function openDefaultCryptoModal() {
+    const m = document.createElement('div');
+    m.className = 'modal-backdrop';
+    const c = state.defaultCrypto || null;
+    m.innerHTML = `
+      <div class="modal">
+        <div class="flex justify-between items-center">
+          <h2>Default crypto (Binance) details</h2>
+          <button id="close" class="btn-hero-outline" style="color:var(--primary);border:1px solid var(--primary);">Close</button>
+        </div>
+        <p class="sub">Used on every payment link that has no custom crypto wallet set in "Manage". Set your main Binance account here — it rarely changes.</p>
+        <form id="default-crypto-form" class="mt-2">
+          <div class="form-group"><label>Binance ID</label><input name="binance_id" value="${esc(c?.binance_id)}" placeholder="173274353"></div>
+          <div class="flex gap-2"><div class="form-group" style="flex:1"><label>TRC20 address</label><input name="trc20_address" value="${esc(c?.trc20_address)}" placeholder="TRC20 address"></div>
+          <div class="form-group" style="flex:1"><label>BEP20 address</label><input name="bep20_address" value="${esc(c?.bep20_address)}" placeholder="BEP20 address"></div></div>
+          <div class="form-group"><label>Instructions for the customer</label><textarea name="instructions" placeholder="Add a memo / reference if needed.">${esc(c?.instructions)}</textarea></div>
+          <p id="default-crypto-err" class="text-secondary small hidden"></p>
+          <button type="submit" class="btn-primary" style="margin-top:.5rem;">Save default crypto details</button>
+        </form>
+      </div>`;
+    document.body.appendChild(m);
+    m.querySelector('#close').addEventListener('click', () => m.remove());
+    m.addEventListener('click', (e) => { if (e.target === m) m.remove(); });
+    m.querySelector('#default-crypto-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const payload = {
+        id: 'default',
+        binance_id: fd.get('binance_id').toString().trim() || null,
+        trc20_address: fd.get('trc20_address').toString().trim() || null,
+        bep20_address: fd.get('bep20_address').toString().trim() || null,
+        instructions: fd.get('instructions').toString().trim() || null,
+        updated_at: new Date().toISOString(),
+      };
+      const { error } = await sb.from('default_crypto_details').upsert(payload, { onConflict: 'id' });
+      if (error) { m.querySelector('#default-crypto-err').textContent = error.message; m.querySelector('#default-crypto-err').classList.remove('hidden'); return; }
       loadAll();
       m.remove();
     });

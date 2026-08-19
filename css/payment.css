@@ -169,6 +169,32 @@
   font-size: .8rem; margin-left: .4rem; font-weight: 600;
 }
 
+/* Crypto network toggle (TRC20 / BEP20 segmented control) */
+.net-toggle {
+  display: flex;
+  gap: .5rem;
+  margin: .75rem 0;
+}
+.net-btn {
+  flex: 1;
+  padding: .6rem .5rem;
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: .6rem;
+  background: #fff;
+  color: var(--text-light);
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .15s;
+}
+.net-btn:hover { border-color: var(--primary); color: var(--primary); }
+.net-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
+
 /* Receipt dropzone */
 .dropzone {
   border: 2px dashed #cdd3e0;

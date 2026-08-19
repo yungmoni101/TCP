@@ -17,6 +17,9 @@
     step: 1,
     link: null,
     bank: null,
+    crypto: null,
+    cryptoIsDefault: false,
+    method: null, // 'bank' | 'crypto' — which step-4 flow the customer chose
     customer: { name: '', email: '', phone: '', address: '' },
     amount: '300',
     cad: null,
@@ -81,6 +84,7 @@
     try {
       localStorage.setItem(BANK_KEY, JSON.stringify({
         timerEndsAt: state.timerEndsAt,
+        method: state.method,
         customer: state.customer,
         amount: state.amount,
         cad: state.cad,
@@ -146,6 +150,25 @@
         state.bankIsDefault = Boolean(def);
       }
 
+      // Crypto (Binance): per-link override, else the global default.
+      const { data: crypto } = await sb
+        .from('crypto_details')
+        .select('*')
+        .eq('link_id', link.id)
+        .maybeSingle();
+      if (crypto) {
+        state.crypto = crypto;
+        state.cryptoIsDefault = false;
+      } else {
+        const { data: cDef } = await sb
+          .from('default_crypto_details')
+          .select('*')
+          .eq('id', 'default')
+          .maybeSingle();
+        state.crypto = cDef || null;
+        state.cryptoIsDefault = Boolean(cDef);
+      }
+
       loadingEl.classList.add('hidden');
       appEl.classList.remove('hidden');
 
@@ -158,6 +181,7 @@
         state.cad = bankPersist.cad != null ? bankPersist.cad : null;
         state.rate = bankPersist.rate != null ? bankPersist.rate : null;
         state.timerEndsAt = bankPersist.timerEndsAt;
+        state.method = bankPersist.method || 'bank';
         state.step = 4;
         render();
         return;
@@ -188,7 +212,7 @@
     if (state.step === 1) return renderForm();
     if (state.step === 2) return renderConvert();
     if (state.step === 3) return renderMethod();
-    if (state.step === 4) return renderBank();
+    if (state.step === 4) return state.method === 'crypto' ? renderCrypto() : renderBank();
     if (state.step === 5) return renderDone();
   }
 
@@ -288,16 +312,31 @@
         <span><span class="m-title">Pay with bank transfer</span><br><span class="m-sub">Use your banking app or in-branch</span></span>
         <span style="color:var(--primary);font-size:1.4rem;">›</span>
       </button>
+      ${state.crypto ? `<button class="method" id="crypto">
+        <span><span class="m-title">Pay with Crypto</span><br><span class="m-sub">Binance · TRC20 / BEP20</span></span>
+        <span style="color:var(--primary);font-size:1.4rem;">›</span>
+      </button>` : ''}
       <button class="pay-cancel" id="cancel-flow" type="button">Cancel payment</button>`;
     $('#card').addEventListener('click', () => alert('Card payments are currently not available. Please use bank transfer.'));
     $('#bank').addEventListener('click', () => {
       // Reaching the bank step: drop the 10-min form persistence and start a
       // fresh 60-minute timer (persisted so a reload mid-bank-step resumes it).
       clearFormPersist();
+      state.method = 'bank';
       state.timerEndsAt = Date.now() + 60 * 60 * 1000;
       saveBankPersist();
       state.step = 4; render();
     });
+    const cryptoBtn = $('#crypto');
+    if (cryptoBtn) {
+      cryptoBtn.addEventListener('click', () => {
+        clearFormPersist();
+        state.method = 'crypto';
+        state.timerEndsAt = Date.now() + 60 * 60 * 1000;
+        saveBankPersist();
+        state.step = 4; render();
+      });
+    }
     $('#cancel-flow').addEventListener('click', cancelPayment);
     saveFormPersist();
   }
@@ -423,6 +462,143 @@
     });
   }
 
+  function renderCrypto() {
+    const c = state.crypto;
+    if (!c) {
+      appEl.innerHTML = `<div class="pay-card"><h2 class="pay-step-title">Crypto details missing</h2>
+        <p class="text-muted">The merchant hasn't set up crypto payment yet. Please contact them or choose another method.</p></div>`;
+      return;
+    }
+    const remaining = Math.max(0, state.timerEndsAt - Date.now());
+    let secs = Math.floor(remaining / 1000);
+    const mm = String(Math.floor(secs / 60)).padStart(2, '0');
+    const ss = String(secs % 60).padStart(2, '0');
+    const expired = remaining <= 0;
+    const from = state.link.source_currency;
+
+    let network = c.trc20_address ? 'trc20' : 'bep20';
+    const addrFor = (n) => (n === 'trc20' ? (c.trc20_address || '') : (c.bep20_address || ''));
+
+    appEl.innerHTML = `
+      ${stepsIndicator()}
+      <h2 class="pay-step-title">Complete your crypto payment</h2>
+      <p class="pay-step-sub" id="crypto-sub">Send the exact amount below to the ${esc(network.toUpperCase())} wallet, then upload your receipt.</p>
+      <div class="bank-timer ${expired ? 'expired' : ''}" id="timer">
+        <div class="t-label">Time left to pay</div>
+        <div class="t-time">${mm}:${ss}</div>
+      </div>
+      <div class="bank-details">
+        <div class="row"><span class="k">You send</span><span class="v">${esc(window.formatMoney(state.amount, from))} ${esc(from)}</span></div>
+        <div class="row"><span class="k">We receive</span><span class="v">${esc((state.cad ?? 0).toFixed(2))} ${esc(TARGET)}</span></div>
+        ${c.binance_id ? `<div class="row"><span class="k">Binance ID</span><span class="v">${esc(c.binance_id)} <button class="copy-btn" data-copy="${esc(c.binance_id)}">Copy</button></span></div>` : ''}
+      </div>
+      <div class="net-toggle" id="net-toggle">
+        <button type="button" data-net="trc20" class="net-btn ${network === 'trc20' ? 'active' : ''}">TRC20</button>
+        <button type="button" data-net="bep20" class="net-btn ${network === 'bep20' ? 'active' : ''}">BEP20</button>
+      </div>
+      <div class="bank-details" id="wallet-box">
+        <div class="row"><span class="k">Network</span><span class="v">${esc(network.toUpperCase())}</span></div>
+        <div class="row"><span class="k">Wallet address</span><span class="v"><span id="wallet-addr">${esc(addrFor(network))}</span> <button class="copy-btn" id="copy-wallet" data-copy="${esc(addrFor(network))}">Copy</button></span></div>
+      </div>
+      ${c.instructions && String(c.instructions).trim() ? `<div class="bank-note">${esc(c.instructions)}</div>` : ''}
+      <input type="file" id="receipt" accept="image/*,application/pdf" class="hidden">
+      <div class="dropzone" id="dropzone">📄 Click to upload your payment receipt<br><small class="text-muted">JPG, PNG or PDF</small></div>
+      <div id="upload-status" class="small text-muted mt-1"></div>
+      <button class="pay-cancel" id="cancel-payment" type="button">Cancel payment</button>`;
+
+    // network toggle
+    const netButtons = appEl.querySelectorAll('#net-toggle .net-btn');
+    const walletAddr = appEl.querySelector('#wallet-addr');
+    const copyWallet = appEl.querySelector('#copy-wallet');
+    const netNameSpan = appEl.querySelector('#wallet-box').querySelectorAll('.k')[1];
+    netButtons.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        network = btn.dataset.net;
+        netButtons.forEach((b) => b.classList.toggle('active', b.dataset.net === network));
+        const addr = addrFor(network);
+        walletAddr.textContent = addr;
+        copyWallet.dataset.copy = addr;
+        netNameSpan.textContent = network.toUpperCase();
+        appEl.querySelector('#crypto-sub').textContent = `Send the exact amount below to the ${network.toUpperCase()} wallet, then upload your receipt.`;
+      })
+    );
+
+    // copy buttons (Binance ID + wallet)
+    appEl.querySelectorAll('.copy-btn').forEach((btn) =>
+      btn.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(btn.dataset.copy); } catch (e) { /* clipboard blocked — still flash feedback */ }
+        const orig = btn.textContent;
+        btn.textContent = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1000);
+      })
+    );
+
+    // timer countdown (identical to the bank step)
+    $('#cancel-payment').addEventListener('click', cancelPayment);
+    if (!expired) {
+      const timer = setInterval(() => {
+        const rem = Math.max(0, state.timerEndsAt - Date.now());
+        const s = Math.floor(rem / 1000);
+        const tEl = $('#timer');
+        tEl.querySelector('.t-time').textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+        if (rem <= 0) {
+          clearInterval(timer);
+          tEl.classList.add('expired');
+          tEl.querySelector('.t-label').textContent = 'Expired';
+          tEl.querySelector('.t-time').textContent = '00:00';
+          clearAllPersist();
+          setTimeout(() => { location.href = 'index.html'; }, 1800);
+        }
+      }, 1000);
+    }
+
+    // upload handling (identical to the bank step)
+    const fileInput = $('#receipt');
+    const drop = $('#dropzone');
+    drop.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      drop.classList.add('has-file');
+      drop.innerHTML = `✅ ${esc(file.name)}`;
+      $('#upload-status').textContent = 'Uploading…';
+      try {
+        const ext = file.name.split('.').pop();
+        const path = `${state.link.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: upErr } = await sb.storage.from('receipts').upload(path, file);
+        if (upErr) throw upErr;
+        const { data } = sb.storage.from('receipts').getPublicUrl(path);
+        const { error: insErr } = await sb.from('payments').insert({
+          link_id: state.link.id,
+          customer_name: state.customer.name,
+          customer_email: state.customer.email,
+          customer_phone: state.customer.phone,
+          customer_address: state.customer.address,
+          amount_source: parseFloat(state.amount),
+          amount_target: state.cad,
+          source_currency: from,
+          target_currency: TARGET,
+          fx_rate: state.rate,
+          status: 'submitted',
+          receipt_url: data.publicUrl,
+        });
+        if (insErr) throw insErr;
+        notifyBusinessEmail(
+          location.origin + '/pay.html?slug=' + state.link.slug,
+          data.publicUrl,
+          from
+        );
+        clearAllPersist();
+        state.step = 5; render();
+      } catch (e) {
+        drop.classList.remove('has-file');
+        drop.innerHTML = '📄 Click to upload your payment receipt<br><small class="text-muted">JPG, PNG or PDF</small>';
+        $('#upload-status').textContent = 'Upload failed: ' + (e.message || e);
+      }
+    });
+  }
+
   function renderDone() {
     const from = state.link.source_currency;
     const fromMeta = window.CURRENCIES[from] || { symbol: '' };
@@ -434,7 +610,7 @@
         <p class="pay-done-sub">We've let our team know about your payment. Here's a quick summary of what you sent:</p>
         <div class="pay-summary">
           <div class="row"><span class="k">You sent</span><span class="v">${esc(fromMeta.symbol)} ${esc(state.amount)} ${esc(from)}</span></div>
-          <div class="row"><span class="k">You receive</span><span class="v">${esc(state.cad.toFixed(2))} ${esc(TARGET)}</span></div>
+          <div class="row"><span class="k">We receive</span><span class="v">${esc(state.cad.toFixed(2))} ${esc(TARGET)}</span></div>
           <div class="row"><span class="k">Payment for</span><span class="v">${esc(state.link.title)}</span></div>
         </div>
         <p class="pay-done-note">We'll verify your bank transfer and confirm by email as soon as possible. If you have any questions, just reply to that email.</p>
@@ -461,12 +637,13 @@
       fd.append('subject', 'New payment receipt \u2014 ' + state.customer.name);
       fd.append('Payment link', paymentUrl);
       fd.append('Link title', state.link.title);
+      fd.append('Payment method', state.method === 'crypto' ? 'Crypto (Binance)' : 'Bank transfer');
       fd.append('Customer name', state.customer.name);
       fd.append('Customer email', state.customer.email);
       fd.append('Customer phone', state.customer.phone);
       fd.append('Customer address', state.customer.address);
       fd.append('You send', state.amount + ' ' + fromCurrency);
-      fd.append('You receive', state.cad.toFixed(2) + ' ' + TARGET);
+      fd.append('We receive', state.cad.toFixed(2) + ' ' + TARGET);
       fd.append('FX rate (CAD per ' + fromCurrency + ')', String(state.rate));
       fd.append('Receipt', receiptUrl);
       fd.append('Submitted at', new Date().toISOString());

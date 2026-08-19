@@ -146,3 +146,53 @@ create policy "public upload receipts" on storage.objects
 drop policy if exists "public read receipts" on storage.objects;
 create policy "public read receipts" on storage.objects
   for select using (bucket_id = 'receipts');
+
+-- ---------- Crypto (Binance) payment ----------
+create table if not exists public.crypto_details (
+  id               uuid primary key default gen_random_uuid(),
+  link_id          uuid unique references public.payment_links (id) on delete cascade,
+  binance_id       text,
+  trc20_address    text,
+  bep20_address    text,
+  instructions     text,
+  updated_at       timestamptz not null default now()
+);
+
+-- Global default crypto (Binance) config. A single row with id = 'default'.
+-- The business's main Binance account — set once, rarely changes.
+create table if not exists public.default_crypto_details (
+  id               text primary key default 'default',
+  binance_id       text,
+  trc20_address    text,
+  bep20_address    text,
+  instructions     text,
+  updated_at       timestamptz not null default now()
+);
+
+alter table public.crypto_details enable row level security;
+alter table public.default_crypto_details enable row level security;
+
+-- Public can read a link's crypto details (only when the link is active).
+drop policy if exists "public read crypto details for active links" on public.crypto_details;
+create policy "public read crypto details for active links" on public.crypto_details
+  for select using (
+    exists (
+      select 1 from public.payment_links pl
+      where pl.id = crypto_details.link_id and pl.active = true
+    )
+  );
+
+-- Anyone (anon) can read the default crypto config (row id is always 'default').
+drop policy if exists "public read default crypto details" on public.default_crypto_details;
+create policy "public read default crypto details" on public.default_crypto_details
+  for select using (true);
+
+drop policy if exists "admin full access crypto details" on public.crypto_details;
+create policy "admin full access crypto details" on public.crypto_details
+  for all using (auth.role() = 'authenticated')
+  with check (auth.role() = 'authenticated');
+
+drop policy if exists "admin full access default crypto details" on public.default_crypto_details;
+create policy "admin full access default crypto details" on public.default_crypto_details
+  for all using (auth.role() = 'authenticated')
+  with check (auth.role() = 'authenticated');
