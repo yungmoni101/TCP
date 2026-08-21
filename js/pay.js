@@ -304,20 +304,24 @@
       ${stepsIndicator()}
       <h2 class="pay-step-title">How would you like to pay?</h2>
       <p class="pay-step-sub">Choose your preferred payment method.</p>
-      <button class="method disabled" id="card" disabled>
-        <span><span class="m-title">Pay with card</span><br><span class="m-sub">Visa, Mastercard, Amex</span></span>
-        <span class="m-tag">Currently not available</span>
+      <button class="method" id="crypto">
+        <span><span class="m-title">Pay with Crypto</span><br><span class="m-sub">Binance · TRC20 / BEP20</span></span>
+        <span style="color:var(--primary);font-size:1.4rem;">›</span>
       </button>
       <button class="method" id="bank">
         <span><span class="m-title">Pay with bank transfer</span><br><span class="m-sub">Use your banking app or in-branch</span></span>
         <span style="color:var(--primary);font-size:1.4rem;">›</span>
       </button>
-      ${state.crypto ? `<button class="method" id="crypto">
-        <span><span class="m-title">Pay with Crypto</span><br><span class="m-sub">Binance · TRC20 / BEP20</span></span>
-        <span style="color:var(--primary);font-size:1.4rem;">›</span>
-      </button>` : ''}
       <button class="pay-cancel" id="cancel-flow" type="button">Cancel payment</button>`;
-    $('#card').addEventListener('click', () => alert('Card payments are currently not available. Please use bank transfer.'));
+    $('#crypto').addEventListener('click', () => {
+      // Reaching the crypto step: drop the 10-min form persistence and start a
+      // fresh 60-minute timer (persisted so a reload mid-step resumes it).
+      clearFormPersist();
+      state.method = 'crypto';
+      state.timerEndsAt = Date.now() + 60 * 60 * 1000;
+      saveBankPersist();
+      state.step = 4; render();
+    });
     $('#bank').addEventListener('click', () => {
       // Reaching the bank step: drop the 10-min form persistence and start a
       // fresh 60-minute timer (persisted so a reload mid-bank-step resumes it).
@@ -327,16 +331,6 @@
       saveBankPersist();
       state.step = 4; render();
     });
-    const cryptoBtn = $('#crypto');
-    if (cryptoBtn) {
-      cryptoBtn.addEventListener('click', () => {
-        clearFormPersist();
-        state.method = 'crypto';
-        state.timerEndsAt = Date.now() + 60 * 60 * 1000;
-        saveBankPersist();
-        state.step = 4; render();
-      });
-    }
     $('#cancel-flow').addEventListener('click', cancelPayment);
     saveFormPersist();
   }
@@ -466,7 +460,9 @@
     const c = state.crypto;
     if (!c) {
       appEl.innerHTML = `<div class="pay-card"><h2 class="pay-step-title">Crypto details missing</h2>
-        <p class="text-muted">The merchant hasn't set up crypto payment yet. Please contact them or choose another method.</p></div>`;
+        <p class="text-muted">The merchant hasn't set up crypto payment yet. Please choose another method.</p>
+        <button class="btn-primary w-full" id="back-method" style="margin-top:1rem;">Choose another method</button></div>`;
+      $('#back-method').addEventListener('click', () => { state.step = 3; render(); });
       return;
     }
     const remaining = Math.max(0, state.timerEndsAt - Date.now());
