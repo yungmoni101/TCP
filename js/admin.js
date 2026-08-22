@@ -211,7 +211,7 @@
               <label class="chk"><input type="checkbox" name="m_card" checked> Pay with card</label>
               <label class="chk"><input type="checkbox" name="m_bank" checked> Bank Transfer</label>
             </div>
-            <p class="small text-muted" style="margin-top:.4rem;">Card is shown as "coming soon" for now. Uncheck any method you don't want offered on this link.</p>
+            <p class="small text-muted" style="margin-top:.4rem;">Card is shown as "currently not available" for now. Uncheck any method you don't want offered on this link.</p>
           </div>
           <hr style="border:none;border-top:1px solid var(--ink-200,#e5e5e5);margin:1rem 0;">
           <p class="small text-muted">Crypto (optional) — wallet addresses for this link. Leave blank to use the default Binance account.</p>
@@ -442,7 +442,7 @@
           <p class="small" id="m-markup" style="margin:.3rem 0 0;"></p>
         </div>
         <h3 style="color:var(--primary);margin:1.5rem 0 .5rem;">Payment methods</h3>
-        <p class="text-muted small">Choose which payment options this link offers. Card is shown as "coming soon" for now.</p>
+        <p class="text-muted small">Choose which payment options this link offers. Card is shown as "currently not available" for now.</p>
         <div class="flex gap-2" style="flex-wrap:wrap;gap:.5rem;margin:.4rem 0 .4rem;">
           <label class="chk"><input type="checkbox" name="m_crypto" ${linkMethods.includes('crypto') ? 'checked' : ''}> Pay with Crypto</label>
           <label class="chk"><input type="checkbox" name="m_card" ${linkMethods.includes('card') ? 'checked' : ''}> Pay with card</label>

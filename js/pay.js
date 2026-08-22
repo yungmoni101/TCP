@@ -318,7 +318,7 @@
       </button>` : ''}
       ${show('card') ? `<button class="method disabled" id="card" disabled>
         <span><span class="m-title">Pay with card</span><br><span class="m-sub">Visa, Mastercard, Amex</span></span>
-        <span class="m-tag">Coming soon</span>
+        <span class="m-tag">Currently not available</span>
       </button>` : ''}
       ${show('bank') ? `<button class="method" id="bank">
         <span><span class="m-title">Bank Transfer</span><br><span class="m-sub">Use your banking app or in-branch</span></span>
