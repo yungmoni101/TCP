@@ -195,6 +195,16 @@
   box-shadow: 0 2px 8px rgba(0,0,0,.12);
 }
 
+/* Method checkbox rows (admin: which payment options a link offers) */
+.chk {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .92rem;
+  cursor: pointer;
+  user-select: none;
+}
+
 /* Receipt dropzone */
 .dropzone {
   border: 2px dashed #cdd3e0;

@@ -181,7 +181,10 @@
         state.cad = bankPersist.cad != null ? bankPersist.cad : null;
         state.rate = bankPersist.rate != null ? bankPersist.rate : null;
         state.timerEndsAt = bankPersist.timerEndsAt;
-        state.method = bankPersist.method || 'bank';
+        // Resume the previously chosen method, but only if this link still
+        // offers it; otherwise fall back to the first enabled method.
+        const avail = (state.link.methods && state.link.methods.length) ? state.link.methods : ['crypto', 'bank'];
+        state.method = (bankPersist.method && avail.includes(bankPersist.method)) ? bankPersist.method : (avail[0] || 'bank');
         state.step = 4;
         render();
         return;
@@ -300,37 +303,52 @@
   }
 
   function renderMethod() {
+    // Only show the methods this link actually offers. Falls back to bank if
+    // (somehow) nothing is enabled, so the customer is never stuck with no option.
+    let methods = (state.link.methods && state.link.methods.length) ? state.link.methods : ['crypto', 'bank'];
+    if (!methods.includes('crypto') && !methods.includes('card') && !methods.includes('bank')) methods = ['bank'];
+    const show = (m) => methods.includes(m);
     appEl.innerHTML = `
       ${stepsIndicator()}
       <h2 class="pay-step-title">How would you like to pay?</h2>
       <p class="pay-step-sub">Choose your preferred payment method.</p>
-      <button class="method" id="crypto">
+      ${show('crypto') ? `<button class="method" id="crypto">
         <span><span class="m-title">Pay with Crypto</span><br><span class="m-sub">Binance · TRC20 / BEP20</span></span>
         <span style="color:var(--primary);font-size:1.4rem;">›</span>
-      </button>
-      <button class="method" id="bank">
-        <span><span class="m-title">Pay with bank transfer</span><br><span class="m-sub">Use your banking app or in-branch</span></span>
+      </button>` : ''}
+      ${show('card') ? `<button class="method disabled" id="card" disabled>
+        <span><span class="m-title">Pay with card</span><br><span class="m-sub">Visa, Mastercard, Amex</span></span>
+        <span class="m-tag">Coming soon</span>
+      </button>` : ''}
+      ${show('bank') ? `<button class="method" id="bank">
+        <span><span class="m-title">Bank Transfer</span><br><span class="m-sub">Use your banking app or in-branch</span></span>
         <span style="color:var(--primary);font-size:1.4rem;">›</span>
-      </button>
+      </button>` : ''}
       <button class="pay-cancel" id="cancel-flow" type="button">Cancel payment</button>`;
-    $('#crypto').addEventListener('click', () => {
-      // Reaching the crypto step: drop the 10-min form persistence and start a
-      // fresh 60-minute timer (persisted so a reload mid-step resumes it).
-      clearFormPersist();
-      state.method = 'crypto';
-      state.timerEndsAt = Date.now() + 60 * 60 * 1000;
-      saveBankPersist();
-      state.step = 4; render();
-    });
-    $('#bank').addEventListener('click', () => {
-      // Reaching the bank step: drop the 10-min form persistence and start a
-      // fresh 60-minute timer (persisted so a reload mid-bank-step resumes it).
-      clearFormPersist();
-      state.method = 'bank';
-      state.timerEndsAt = Date.now() + 60 * 60 * 1000;
-      saveBankPersist();
-      state.step = 4; render();
-    });
+    const cryptoBtn = $('#crypto');
+    if (cryptoBtn) {
+      cryptoBtn.addEventListener('click', () => {
+        // Reaching the crypto step: drop the 10-min form persistence and start a
+        // fresh 60-minute timer (persisted so a reload mid-step resumes it).
+        clearFormPersist();
+        state.method = 'crypto';
+        state.timerEndsAt = Date.now() + 60 * 60 * 1000;
+        saveBankPersist();
+        state.step = 4; render();
+      });
+    }
+    const bankBtn = $('#bank');
+    if (bankBtn) {
+      bankBtn.addEventListener('click', () => {
+        // Reaching the bank step: drop the 10-min form persistence and start a
+        // fresh 60-minute timer (persisted so a reload mid-bank-step resumes it).
+        clearFormPersist();
+        state.method = 'bank';
+        state.timerEndsAt = Date.now() + 60 * 60 * 1000;
+        saveBankPersist();
+        state.step = 4; render();
+      });
+    }
     $('#cancel-flow').addEventListener('click', cancelPayment);
     saveFormPersist();
   }
@@ -458,7 +476,9 @@
 
   function renderCrypto() {
     const c = state.crypto;
-    if (!c) {
+    // Missing if there's no row at all, or the row has no usable destination
+    // (neither a Binance ID nor any wallet address configured).
+    if (!c || (!c.binance_id && !c.trc20_address && !c.bep20_address)) {
       appEl.innerHTML = `<div class="pay-card"><h2 class="pay-step-title">Crypto details missing</h2>
         <p class="text-muted">The merchant hasn't set up crypto payment yet. Please choose another method.</p>
         <button class="btn-primary w-full" id="back-method" style="margin-top:1rem;">Choose another method</button></div>`;
@@ -474,11 +494,18 @@
 
     let network = c.trc20_address ? 'trc20' : 'bep20';
     const addrFor = (n) => (n === 'trc20' ? (c.trc20_address || '') : (c.bep20_address || ''));
+    const hasBinance = Boolean(c.binance_id);
+    const hasWallet = Boolean(c.trc20_address || c.bep20_address);
+    // Default to Binance ID when it's set; the wallet address is the fallback.
+    let payMode = hasBinance ? 'binance' : 'wallet';
+    const subText = (mode) => mode === 'binance'
+      ? `Send the exact amount below to Binance ID ${esc(c.binance_id)}, then upload your receipt.`
+      : `Send the exact amount below to the ${esc(network.toUpperCase())} wallet, then upload your receipt.`;
 
     appEl.innerHTML = `
       ${stepsIndicator()}
       <h2 class="pay-step-title">Complete your crypto payment</h2>
-      <p class="pay-step-sub" id="crypto-sub">Send the exact amount below to the ${esc(network.toUpperCase())} wallet, then upload your receipt.</p>
+      <p class="pay-step-sub" id="crypto-sub">${subText(payMode)}</p>
       <div class="bank-timer ${expired ? 'expired' : ''}" id="timer">
         <div class="t-label">Time left to pay</div>
         <div class="t-time">${mm}:${ss}</div>
@@ -486,15 +513,24 @@
       <div class="bank-details">
         <div class="row"><span class="k">You send</span><span class="v">${esc(window.formatMoney(state.amount, from))} ${esc(from)}</span></div>
         <div class="row"><span class="k">We receive</span><span class="v">${esc((state.cad ?? 0).toFixed(2))} ${esc(TARGET)}</span></div>
-        ${c.binance_id ? `<div class="row"><span class="k">Binance ID</span><span class="v">${esc(c.binance_id)} <button class="copy-btn" data-copy="${esc(c.binance_id)}">Copy</button></span></div>` : ''}
       </div>
-      <div class="net-toggle" id="net-toggle">
-        <button type="button" data-net="trc20" class="net-btn ${network === 'trc20' ? 'active' : ''}">TRC20</button>
-        <button type="button" data-net="bep20" class="net-btn ${network === 'bep20' ? 'active' : ''}">BEP20</button>
+      ${hasBinance && hasWallet ? `<div class="net-toggle" id="pay-mode">
+        <button type="button" data-mode="binance" class="net-btn ${payMode === 'binance' ? 'active' : ''}">Pay to Binance ID</button>
+        <button type="button" data-mode="wallet" class="net-btn ${payMode === 'wallet' ? 'active' : ''}">Pay to wallet address</button>
+      </div>` : ''}
+      <div class="bank-details" id="binance-box" ${payMode === 'binance' ? '' : 'style="display:none;"'}>
+        <div class="row"><span class="k">Binance ID</span><span class="v">${esc(c.binance_id)} <button class="copy-btn" data-copy="${esc(c.binance_id)}">Copy</button></span></div>
+        <div class="row"><span class="k">How to pay</span><span class="v">Send via Binance to the ID above.</span></div>
       </div>
-      <div class="bank-details" id="wallet-box">
-        <div class="row"><span class="k">Network</span><span class="v">${esc(network.toUpperCase())}</span></div>
-        <div class="row"><span class="k">Wallet address</span><span class="v"><span id="wallet-addr">${esc(addrFor(network))}</span> <button class="copy-btn" id="copy-wallet" data-copy="${esc(addrFor(network))}">Copy</button></span></div>
+      <div id="wallet-box" ${payMode === 'wallet' ? '' : 'style="display:none;"'}>
+        <div class="net-toggle" id="net-toggle">
+          <button type="button" data-net="trc20" class="net-btn ${network === 'trc20' ? 'active' : ''}">TRC20</button>
+          <button type="button" data-net="bep20" class="net-btn ${network === 'bep20' ? 'active' : ''}">BEP20</button>
+        </div>
+        <div class="bank-details">
+          <div class="row"><span class="k">Network</span><span class="v" id="wallet-net">${esc(network.toUpperCase())}</span></div>
+          <div class="row"><span class="k">Wallet address</span><span class="v"><span id="wallet-addr">${esc(addrFor(network))}</span> <button class="copy-btn" id="copy-wallet" data-copy="${esc(addrFor(network))}">Copy</button></span></div>
+        </div>
       </div>
       ${c.instructions && String(c.instructions).trim() ? `<div class="bank-note">${esc(c.instructions)}</div>` : ''}
       <input type="file" id="receipt" accept="image/*,application/pdf" class="hidden">
@@ -502,11 +538,25 @@
       <div id="upload-status" class="small text-muted mt-1"></div>
       <button class="pay-cancel" id="cancel-payment" type="button">Cancel payment</button>`;
 
-    // network toggle
+    // pay-mode sub-toggle: Binance ID vs wallet address
+    const binanceBox = appEl.querySelector('#binance-box');
+    const walletBox = appEl.querySelector('#wallet-box');
+    const modeButtons = appEl.querySelectorAll('#pay-mode .net-btn');
+    modeButtons.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        payMode = btn.dataset.mode;
+        modeButtons.forEach((b) => b.classList.toggle('active', b.dataset.mode === payMode));
+        binanceBox.style.display = payMode === 'binance' ? '' : 'none';
+        walletBox.style.display = payMode === 'wallet' ? '' : 'none';
+        appEl.querySelector('#crypto-sub').textContent = subText(payMode);
+      })
+    );
+
+    // network toggle (only relevant in wallet mode)
     const netButtons = appEl.querySelectorAll('#net-toggle .net-btn');
     const walletAddr = appEl.querySelector('#wallet-addr');
     const copyWallet = appEl.querySelector('#copy-wallet');
-    const netNameSpan = appEl.querySelector('#wallet-box').querySelectorAll('.k')[1];
+    const netNameSpan = walletBox.querySelector('#wallet-net');
     netButtons.forEach((btn) =>
       btn.addEventListener('click', () => {
         network = btn.dataset.net;
@@ -515,7 +565,7 @@
         walletAddr.textContent = addr;
         copyWallet.dataset.copy = addr;
         netNameSpan.textContent = network.toUpperCase();
-        appEl.querySelector('#crypto-sub').textContent = `Send the exact amount below to the ${network.toUpperCase()} wallet, then upload your receipt.`;
+        appEl.querySelector('#crypto-sub').textContent = subText('wallet');
       })
     );
 

@@ -17,6 +17,9 @@ create table if not exists public.payment_links (
   -- NULL = use the live market rate at the time the customer pays.
   rate_override   numeric,
   rate_markup_pct numeric,
+  -- Which payment methods this link offers. Values: 'crypto', 'card', 'bank'.
+  -- The customer picker only shows the methods listed here.
+  methods         text[] not null default array['crypto','bank'],
   active          boolean not null default true,
   created_at      timestamptz not null default now(),
   created_by      uuid references auth.users (id)
@@ -25,6 +28,10 @@ create table if not exists public.payment_links (
 -- Add the rate columns if this script is re-run on an existing project.
 alter table public.payment_links add column if not exists rate_override numeric;
 alter table public.payment_links add column if not exists rate_markup_pct numeric;
+
+-- Add the methods column if this script is re-run on an existing project.
+-- Existing links backfill to crypto + bank (card was added later).
+alter table public.payment_links add column if not exists methods text[] not null default array['crypto','bank'];
 
 create index if not exists payment_links_slug_idx on public.payment_links (slug);
 

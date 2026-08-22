@@ -204,6 +204,15 @@
             </div>
             <p class="small text-secondary" id="rate-markup"></p>
           </div>
+          <div class="form-group" style="margin-top:1rem;">
+            <label>Payment methods available on this link</label>
+            <div class="flex gap-2" style="flex-wrap:wrap;gap:.5rem;margin-top:.4rem;">
+              <label class="chk"><input type="checkbox" name="m_crypto" checked> Pay with Crypto</label>
+              <label class="chk"><input type="checkbox" name="m_card" checked> Pay with card</label>
+              <label class="chk"><input type="checkbox" name="m_bank" checked> Bank Transfer</label>
+            </div>
+            <p class="small text-muted" style="margin-top:.4rem;">Card is shown as "coming soon" for now. Uncheck any method you don't want offered on this link.</p>
+          </div>
           <hr style="border:none;border-top:1px solid var(--ink-200,#e5e5e5);margin:1rem 0;">
           <p class="small text-muted">Crypto (optional) — wallet addresses for this link. Leave blank to use the default Binance account.</p>
           <div class="form-group"><label>Binance ID</label><input name="binance_id" value="${esc(state.defaultCrypto?.binance_id)}" placeholder="173274353"></div>
@@ -344,12 +353,19 @@
         slug = genSlug();
       }
 
+      // Payment methods offered on this link (from the checkboxes above).
+      const methods = [];
+      if (fd.get('m_crypto')) methods.push('crypto');
+      if (fd.get('m_card')) methods.push('card');
+      if (fd.get('m_bank')) methods.push('bank');
+
       const insertPayload = () => ({
         slug, title,
         source_currency: fd.get('source_currency').toString(),
         target_currency: TARGET,
         rate_override: override,
         rate_markup_pct: markup,
+        methods: methods.length ? methods : ['crypto','bank'],
       });
 
       let res = await sb.from('payment_links').insert(insertPayload());
@@ -406,6 +422,7 @@
     const payments = state.paymentsByLink[link.id] || [];
     const crypto = state.cryptoByLink[link.id] || null;
     const hasCrypto = Boolean(crypto);
+    const linkMethods = link.methods || ['crypto','bank'];
     m.innerHTML = `
       <div class="modal">
         <div class="flex justify-between items-center">
@@ -424,6 +441,16 @@
           <p class="small text-muted" id="m-live" style="margin:.6rem 0 0;"></p>
           <p class="small" id="m-markup" style="margin:.3rem 0 0;"></p>
         </div>
+        <h3 style="color:var(--primary);margin:1.5rem 0 .5rem;">Payment methods</h3>
+        <p class="text-muted small">Choose which payment options this link offers. Card is shown as "coming soon" for now.</p>
+        <div class="flex gap-2" style="flex-wrap:wrap;gap:.5rem;margin:.4rem 0 .4rem;">
+          <label class="chk"><input type="checkbox" name="m_crypto" ${linkMethods.includes('crypto') ? 'checked' : ''}> Pay with Crypto</label>
+          <label class="chk"><input type="checkbox" name="m_card" ${linkMethods.includes('card') ? 'checked' : ''}> Pay with card</label>
+          <label class="chk"><input type="checkbox" name="m_bank" ${linkMethods.includes('bank') ? 'checked' : ''}> Bank Transfer</label>
+        </div>
+        <p id="methods-err" class="text-secondary small hidden"></p>
+        <p id="methods-ok" class="small hidden" style="color:#2e7d32;font-weight:600;margin:.2rem 0 .6rem;">✓ Saved</p>
+        <button type="button" class="btn-primary" id="save-methods">Save payment methods</button>
         <h3 style="color:var(--primary);margin:1.5rem 0 .5rem;">Bank transfer details</h3>
         <p class="text-muted small">Customers see these when they pick "pay with bank transfer".</p>
         <form id="bank-form" class="mt-2">
@@ -536,6 +563,31 @@
         await sb.from('bank_details').delete().eq('link_id', link.id);
         loadAll();
         m.remove();
+      });
+    }
+
+    // ---- payment methods (which options this link offers) ----
+    const methodsErr = m.querySelector('#methods-err');
+    const methodsOk = m.querySelector('#methods-ok');
+    if (methodsErr) methodsErr.classList.add('hidden');
+    if (methodsOk) methodsOk.classList.add('hidden');
+    const saveMethodsBtn = m.querySelector('#save-methods');
+    if (saveMethodsBtn) {
+      saveMethodsBtn.addEventListener('click', async () => {
+        const methods = [];
+        if (m.querySelector('[name="m_crypto"]').checked) methods.push('crypto');
+        if (m.querySelector('[name="m_card"]').checked) methods.push('card');
+        if (m.querySelector('[name="m_bank"]').checked) methods.push('bank');
+        if (!methods.length) {
+          methodsErr.textContent = 'Select at least one payment method.';
+          methodsErr.classList.remove('hidden');
+          return;
+        }
+        const { error } = await sb.from('payment_links').update({ methods }).eq('id', link.id);
+        if (error) { methodsErr.textContent = error.message; methodsErr.classList.remove('hidden'); return; }
+        methodsOk.classList.remove('hidden');
+        setTimeout(() => methodsOk.classList.add('hidden'), 2500);
+        loadAll();
       });
     }
 
